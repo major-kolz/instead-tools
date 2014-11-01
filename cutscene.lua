@@ -5,6 +5,7 @@
 -- 		Добавлен тэг upd, что эквивалентен прошлому {cut}{cls}. При нажатии вызывает метод update() комнаты-cutscene
 -- 		Удален cls (upd покрывает функциональность)
 -- 		Можно использовать left
+-- 	https://github.com/major-kolz/instead-tools/blob/master/cutscene.lua
 -- 	Николай Коновалов, 27.08.13
 
 require "timer"

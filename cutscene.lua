@@ -1,6 +1,7 @@
 -- Модуль cutscene для для последовательной подачи текста
 -- Автор: Пётр Косых, http://instead.syscall.ru/wiki/ru/gamedev/modules/cutscene
 -- 	Изменения: 
+-- 		Внешний вид {cut} "по-умолчанию" теперь определяется полем _cutDefTxt (">>>"). 
 -- 		{cut} теперь предварен _cutPrefix (по-умолчанию: "^^" - кнопка выводится через пустую строку)  
 -- 		Добавлен тэг {upd}, что эквивалентен прошлому {cut}{cls}. 
 -- 		{upd} вызывает метод update() комнаты-cutscene
@@ -11,8 +12,6 @@
 
 require "timer"
 require "xact"
-
-stead.cut_text = '>>>'
 
 local function get_token(txt, pos)
 	local s, e = tonumber(pos) or 1;
@@ -63,8 +62,8 @@ end
 cutscene = function(v)
 	v.txt = v.dsc
 	v.forcedsc = true
-
 	v._cutPrefix = v._cutPrefix or "^^";			-- предварять cut-кнопку пустой строкой
+	v._cutDefTxt = v._cutDefTxt or ">>>";			-- определим внешний вид cut-кнопки (наверное, можно и картинку через img ) 
 	v._readFrom = 1;										-- счетчик для не отображаемой (просмотренной) части
 
 	v.update = v.update or function() return false end;
@@ -82,7 +81,7 @@ cutscene = function(v)
 		elseif t == "function" then
 			s:left_react();
 		else
-			error("Illegal left handler! Type is: " .. t )
+			error("Illegal 'left' handler! Type is: " .. t )
 		end
 	end;
 
@@ -211,13 +210,13 @@ cutscene = function(v)
 		elseif c == 'cut' then
 			self._state = self._state + 1
 			if not a or a == "" then
-				a = stead.cut_text
+				a = v._cutDefTxt
 			end
 			v._dsc = v._dsc .. v._cutPrefix .. "{cut|"..a.."}";
 		elseif c == 'upd' then
 			self._state = 1
 			if not a or a == "" then
-				a = stead.cut_text
+				a = v._cutDefTxt
 			end
 			v._dsc = v._dsc .. v._cutPrefix .. "{upd(" .. e .. ")|"..a.."}";
 		elseif c == "fading" then

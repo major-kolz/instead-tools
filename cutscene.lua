@@ -1,12 +1,13 @@
 -- Модуль cutscene для для последовательной подачи текста
 -- Автор: Пётр Косых, http://instead.syscall.ru/wiki/ru/gamedev/modules/cutscene
 -- 	Изменения: 
--- 		{cut} теперь предварен _cutPrefix (по-умолчанию: "^^" - кнопка выводится с нового абзаца)  
--- 		Добавлен тэг upd, что эквивалентен прошлому {cut}{cls}. При нажатии вызывает метод update() комнаты-cutscene
+-- 		{cut} теперь предварен _cutPrefix (по-умолчанию: "^^" - кнопка выводится через пустую строку)  
+-- 		Добавлен тэг {upd}, что эквивалентен прошлому {cut}{cls}. 
+-- 		{upd} вызывает метод update() комнаты-cutscene
 -- 		Удален cls (upd покрывает функциональность)
 -- 		Можно использовать left
 -- 	https://github.com/major-kolz/instead-tools/blob/master/cutscene.lua
--- 	Николай Коновалов, 27.08.13
+-- 	Николай Коновалов
 
 require "timer"
 require "xact"

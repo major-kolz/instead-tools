@@ -7,11 +7,11 @@ Code wrappers for high-usage constructions (selections from list by index, error
 
 * ##### cutscene.lua
 Modified [cutscene module](http://instead.syscall.ru/wiki/ru/gamedev/modules/cutscene)(ru). Changes:
-- set default {cut} view by field _cutDefTxt
-- {cut} follow after blank line ("^^"). For change it, specify field _cutPrefix
-- {cls} is abandoned, use {upd} instead {cut}{cls}
-- {upd} call method 'update' of this room
-- you may use method 'left'
+  - set default {cut} view by field _cutDefTxt
+  - {cut} follow after blank line ("^^"). For change it, specify field _cutPrefix
+  - {cls} is abandoned, use {upd} instead {cut}{cls}
+  - {upd} call method 'update' of this room
+  - you may use method 'left'
 
 * ##### vim/lua.snippets
 My snippets for [Vim](www.vim.org/). I use [vim-snipmate](https://github.com/garbas/vim-snipmate) plugin for play it. First part of the file contain pure Lua construction, second - INSTEAD-specify snippets. At the end you can see snippets for my useful.lua 

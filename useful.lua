@@ -11,8 +11,14 @@
 --| ret = state and <exp1> or <exp2>  Если state истинно, то ret получит <exp1> иначе <exp2>. Из Programming on Lua 2ed, Ierusalimschy
 --| В строку темы default помещается 84 символа: 82 знака '*' и 2 '|'
 
+function isErr( cond, msg, lvl )			-- Лаконичная форма для отлова ошибок.   
+	if cond then								-- Если используете непосредственно в комнатах/объектах - передавайте '2' на месте lvl
+		error( msg, lvl or 3 )
+	end
+end
+
 function offset_ (size) 					-- Вывести отступ указанной размерности (в пикселях)
-	assert( size ~= nil and size > 0, "Недопустимая величина отступа: " .. size );
+	isErr( size == nil or size < 0, "Недопустимая величина отступа: " .. (size or 'nil') );
 	return img("blank:" .. size .."x1");
 end
 
@@ -24,26 +30,18 @@ function prnd (var)
 	p (var[ rnd(#var) ]);
 end
 
-function floor_ (num, round_to)			-- Возвращает num с точностью до round_to знака после запятой (TODO через string.format) 
-	return ( num - num%(0.1^round_to) );
+function floor_ (num, round_to)			-- Возвращает num с точностью до round_to знака после запятой 
+	return string.format("%." .. round_to .. "f", num);
 end
 
 function phx_ (num)							-- Вывести num в шестнадцатеричном представлении 
-	return string.format("%x", num);	
-end
-
-function CaptainObviously_ (s)			-- Возвращает имя или описание объекта s					
-	local who = s.disp or s.nam;
-	local t = type(who); 
-	if t == "string" then
-		return who;
-	elseif t == "function" then
-		return who();
-	end
+	return string.format("%X", num);	
 end
 
 function _dynout (vis_desc)				-- Динамическое описание сцены по совету v.v.b; вызывая, по очереди выведем весь vis_desc
 	local visit = 0;							-- После выхода из игры вывод пойдет сначала
+	isErr( type(vis_desc) ~= "table", "_dynout take table as parameter")
+
 	return function ()
 		if visit ~= #vis_desc then
 			visit = visit + 1;
@@ -54,7 +52,7 @@ end
 
 function switch (condition)				-- Оператор выбора для условия condition
 	return function(data)					-- data может иметь поле def: на случай недопустимых значений condition 
-		assert( type(data) == "table", "Switch data should be table. Got: " .. type(data) );
+		isErr( type(data) ~= "table", "Switch data should be table. Got: " .. type(data) );
 
 		local react = data[condition] or data.def or function() return true end;
 		local t = type( react );

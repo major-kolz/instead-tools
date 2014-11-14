@@ -1,6 +1,6 @@
 instead-tools
 =============
-My groundwork for game writing for [INSTEAD](http://instead.syscall.ru/index.html)-platform. Some of files (e.g. *lua.snippets*) should be at specific directories, but I suggest you substitute it with symbolic links (symlinks). That allow you refresh instead-tools only by "git pull", without annoying file-copying.
+My groundwork for game writing for [INSTEAD](http://instead.syscall.ru/index.html)-platform. Some of files (e.g. *lua.snippets*) should be at specific directories, but I suggest you substitute it with symbolic links (symlinks). That allow you refresh instead-tools only by "git pull", without annoying file-copying in every project folder.
 
 Project contains:
 

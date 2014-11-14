@@ -104,8 +104,8 @@ snippet --=2
 # ===Создание шапки
 snippet insteadbegin
 	--$Name: ${1:Game name}$
-	--$Version: ${2:0.1}$
-	--$Author: ${3:Author name}$
+	--$Version: 0.1
+	--$Author: ${2:major kolz}$
 
 	instead_version "1.9.1";
 
@@ -114,16 +114,18 @@ snippet insteadbegin
 	format.para 	= true;			-- Отступы в начале абзаца;
 	format.dash 	= true;			-- Замена двойного минуса на длинное тире;
 	format.quotes 	= true;			-- Замена " " на типографские << >>;
+
+	dofile 'useful.lua'
 	
 	main = room {
-		nam = ${4: '...'},
-		dsc = ${5: nil};
+		nam = ${3:'...'},
+		dsc = ${4:nil};
 		enter = function()
-			walk "${6: \"first game room\"}";
+			walk "${5: first_game_room}";
 		end,
 	};
 
-	$6 = room${7}
+	$5 = room${6}
 #
 # ===Базовые конструкции
 snippet room

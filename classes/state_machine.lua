@@ -1,3 +1,17 @@
+if not package.loaded.useful then
+	error "Can't find 'useful' package! Is it loaded in code? Is file 'useful.lua' exist in game folder?";
+end
+
+function curr(s, isBranches)
+	local mod = isBranches and "branches" or "states"
+	return s[mod][ s.current_state ];
+end
+
+-- Дополнительные (и не наследуемые) свойства состояний:
+-- takable			 брать при первом touch
+-- reflexive		 use и used воспринимаются как одно и тоже (used переадресовывается)
+
+-- TODO проверять названия элементов branches и states (позволит отсеять опечатки)
 function stm ( v )
 	-- Prepare for construction
 	for _, field in ipairs { "desc", "dsc", "act", "take", "inv", "use", "used", "nouse", "enter", "exit", "entered", "left"} do
@@ -20,14 +34,14 @@ function stm ( v )
 	v.disp = function(s)
 		local disp = stm_select(s, s.current_state, "nam")				
 		if not disp then
-			if s.states[s.current_state].iam then
+			if curr(s).iam then
 				disp = s.current_state											-- Отображение имени объекта может совпадать с тэгом состояния 
 			else
 				disp = stm_select(s, s.current_state, 1)					-- Сокращенная форма, без присваивания в nam
 			end
 		end
 
-		return tcall( disp )
+		return tcall( disp )														-- В случае disp==nil (безымянные состояния), используем v.nam
 	end
 	v.dsc = function(s)
 		local dsc = stm_select(s, s.current_state, "dsc")
@@ -35,9 +49,9 @@ function stm ( v )
 	end
 	v.act = function(s)
 		local act = stm_select(s, s.current_state, "touch");			-- touch покрывает act, inv и tak классического API
-		local jumpTo = s.branches[s.current_state].taked
+		local jumpTo = curr(s, true).taked
 		jumpTo = tcall(jumpTo, s)
-		if s.states[s.current_state].takable == true then				-- Свойство takable не наследуется!  
+		if curr(s).takable == true then										-- Свойство takable не наследуется!  
 			take(s)
 		end
 
@@ -51,10 +65,24 @@ function stm ( v )
 		local inv = stm_select(s, s.current_state, "touch");
 		return tcall(inv)
 	end
+	v.use = function(s, w)												
+		local use = stm_select(s, s.current_state, "use");
+		return tcall(inv, w)
+	end
+	v.used = function(s, w)
+		if curr(s).reflexive then
+			return s:use(w);
+		end
+	
+		local used = stm_select(s, s.current_state, "used");
+		return tcall(used, w);
+	end
 
 	return obj(v)
 end
 
+
+-- TODO rewrite with 'curr' function
 function stm_select ( machine, current_state, field, mode )
 	mode = mode or "states"														-- Параметр со значением по-умолчанию
 	isErr( type( machine[mode][current_state] ) ~= "table", "Your machine haven't state: " .. current_state )
@@ -83,3 +111,5 @@ function tcall(f, s)				-- wiki, "Приемы программирования"
 		return f
 	end
 end
+
+return stm;

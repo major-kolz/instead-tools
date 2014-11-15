@@ -12,7 +12,7 @@
 --| В строку темы default помещается 84 символа: 82 знака '*' и 2 '|'
 
 --| Чтобы можно было писать require "<clasnam>" и не копировать <clasnam>.lua в папку с проектом 
-package.path = package.path .. ";../instead-tools/classes/?.lua" 
+stead.package.path = stead.package.path .. ";../instead-tools/classes/?.lua" 
 
 function isErr( cond, msg, lvl )			-- Лаконичная форма для отлова ошибок.   
 	if cond then								-- Если используете непосредственно в комнатах/объектах - передавайте '2' на месте lvl

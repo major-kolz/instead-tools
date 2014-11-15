@@ -80,23 +80,23 @@ function image_ (nam)
 	return 'img/' .. nam .. '.png';	
 end
 
-function _if ( cond, posact, negact )		-- Сокращение на случай, если обработчик имеет два состояния и возвращает текст
-	return function(s)							-- cond - строка с именем управляющей переменной (из этого объекта/комнаты)
+function _if ( cond, pos, neg )			-- Сокращение на случай, если обработчик имеет два состояния и возвращает текст
+	return function(s)						-- cond - строка с именем управляющей переменной (из этого объекта/комнаты)
 		if s[cond] then
-			p( posact );
+			p( pos );
 		else
-			p( negact );
+			p( neg );
 		end
 	end
 end
 
-function _trig ( cond, posact, negact )	-- Для двухступенчатых событий. Первый раз выполняется posact, все остальные - negact 
-	return function(s)							-- Пример использования: объекты с вводным(расширенным) и игровым описаниями 
+function _trig ( cond, pos, neg )		-- Для двухступенчатых событий. Первый раз выполняется posact, все остальные - negact 
+	return function(s)						-- Пример использования: объекты с вводным(расширенным) и игровым описаниями 
 		if s[cond] then
-			p( posact );
+			p( pos );
 			s[cond] = false;
 		else
-			p( negact );
+			p( neg );
 		end
 	end
 end

@@ -28,4 +28,4 @@ Scripts, that simplify non-writting gamedeveloping.
 	- **assist.sh** - [under construction] will pack game for you (with [repo](http://instead-games.ru/)-correct name and substitut symlinks by real modules)
 
 * #### examples/
-Simple games, that help you familiarize yourself *with instead-tools*. Script *unfold_all.sh* create folders in instead-projects directory (i.e "~/.instead/games") with this examples (change the names to *main.lua*) and add symlink for *useful.lua*
+Simple games, that help you familiarize yourself with *instead-tools*. Script *unfold_all.sh* create folders in instead-projects directory (i.e "~/.instead/games") with this examples (change the names to *main.lua*) and add symlink for *useful.lua*

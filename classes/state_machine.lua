@@ -1,6 +1,4 @@
-if not package.loaded.useful then
-	error "Can't find 'useful' package! Is it loaded in code? Is file 'useful.lua' exist in game folder?";
-end
+require "useful"
 
 function curr(s, isBranches)
 	local mod = isBranches and "branches" or "states"

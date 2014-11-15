@@ -11,9 +11,6 @@
 --| ret = state and <exp1> or <exp2>  Если state истинно, то ret получит <exp1> иначе <exp2>. Из Programming on Lua 2ed, Ierusalimschy
 --| В строку темы default помещается 84 символа: 82 знака '*' и 2 '|'
 
---| Чтобы можно было писать require "<clasnam>" и не копировать <clasnam>.lua в папку с проектом 
-package.path = package.path .. ";../instead-tools/classes/?.lua" 
-
 function isErr( cond, msg, lvl )			-- Лаконичная форма для отлова ошибок.   
 	if cond then								-- Если используете непосредственно в комнатах/объектах - передавайте '2' на месте lvl
 		error( msg, lvl or 3 )

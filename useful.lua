@@ -11,9 +11,12 @@
 --| ret = state and <exp1> or <exp2>  Если state истинно, то ret получит <exp1> иначе <exp2>. Из Programming on Lua 2ed, Ierusalimschy
 --| В строку темы default помещается 84 символа: 82 знака '*' и 2 '|'
 
+<<<<<<< HEAD
 --| Чтобы можно было писать require "<clasnam>" и не копировать <clasnam>.lua в папку с проектом 
 stead.package.path = stead.package.path .. ";../instead-tools/classes/?.lua" 
 
+=======
+>>>>>>> 1141b5227d56832921c6c0158084589ae9f6d258
 function isErr( cond, msg, lvl )			-- Лаконичная форма для отлова ошибок.   
 	if cond then								-- Если используете непосредственно в комнатах/объектах - передавайте '2' на месте lvl
 		error( msg, lvl or 3 )
@@ -83,23 +86,23 @@ function image_ (nam)
 	return 'img/' .. nam .. '.png';	
 end
 
-function _if ( cond, posact, negact )		-- Сокращение на случай, если обработчик имеет два состояния и возвращает текст
-	return function(s)							-- cond - строка с именем управляющей переменной (из этого объекта/комнаты)
+function _if ( cond, pos, neg )			-- Сокращение на случай, если обработчик имеет два состояния и возвращает текст
+	return function(s)						-- cond - строка с именем управляющей переменной (из этого объекта/комнаты)
 		if s[cond] then
-			p( posact );
+			p( pos );
 		else
-			p( negact );
+			p( neg );
 		end
 	end
 end
 
-function _trig ( cond, posact, negact )	-- Для двухступенчатых событий. Первый раз выполняется posact, все остальные - negact 
-	return function(s)							-- Пример использования: объекты с вводным(расширенным) и игровым описаниями 
+function _trig ( cond, pos, neg )		-- Для двухступенчатых событий. Первый раз выполняется posact, все остальные - negact 
+	return function(s)						-- Пример использования: объекты с вводным(расширенным) и игровым описаниями 
 		if s[cond] then
-			p( posact );
+			p( pos );
 			s[cond] = false;
 		else
-			p( negact );
+			p( neg );
 		end
 	end
 end

@@ -1,4 +1,4 @@
---$Name: Конечный автомат. Пример$
+--$Name: Пример 3.1 Конечный автомат$
 --$Version: 0.1$
 --$Author: Николай Коновалов$
 
@@ -10,8 +10,8 @@ format.para 	= true;			-- Отступы в начале абзаца;
 format.dash 	= true;			-- Замена двойного минуса на длинное тире;
 format.quotes 	= true;			-- Замена " " на типографские << >>;
 
-dofile "useful.lua"
-require "classes"
+require "useful"
+require "state_machine"
 
 main = room {
 	nam =  '...',
@@ -28,7 +28,7 @@ assault_rifle = stm {
 		charge 	= 30;
 	},
 	states = {
-		{ "Машинган", dsc = "На столе лежит {автомат}", touch = "О, автомат", takable = true },
+		{ "Машинган", dsc = "На столе лежит {автомат}.", touch = "О, автомат", takable = true },
 		["В руках"] = { iam = true, touch = "Я сжимаю автомат", use = "Peow", reflexive = true },
 		["Пустой"] = { nam = "Разряженный автомат", touch ="Я прямо чувствую, что он пуст, он легче" }; 
 	},
@@ -43,12 +43,17 @@ assault_rifle = stm {
 					else	s.charge = s.charge - 1 
 				end 
 			end,
-		};
+		},
 	},
 }
 
 aim = obj{
 	nam = "Мишень",
-	dsc = [[Впереди маячит {мишень}]],
-	act = [[Ни черта не видно]], 
+	_firstSign = true;
+	dsc = _if( "_firstSign", 
+		"Впереди, метрах в сорока, находятся пустые остовы {мишеней}.",
+		"Впереди маячит {мишень}." );
+	act = _trig( "_firstSign",
+		"Какой-то солдат прошел и развесил, начиная с левого краю, свежие бумажки и мишенями",
+		"Ни черта не видно" ); 
 };

@@ -20,6 +20,7 @@ My snippets for [Vim](www.vim.org/). I use [vim-snipmate](https://github.com/gar
 
 * #### classes/
 I am writing new module, that should help with interactivity in game. My aim: define classes of INTEAD's *obj* with specific functionality and simplify the way of it creating. I think, an author wish not spend his time for coding features (*obj* interaction, in this context), that appear in game once or twice. So, I catch some of this patterns of interacting and code it for your. 
+**NOTICE:** If you want use *require "class-name"* syntax, you should create symlink in *~/.instead/games* for *classes/class-name.lua*. To link them all use *distribute.sh*
 
 * #### minIDE/
 Scripts, that simplify non-writting gamedeveloping.
@@ -27,3 +28,4 @@ Scripts, that simplify non-writting gamedeveloping.
 	- **assist.sh** - [under construction] will pack game for you (with [repo](http://instead-games.ru/)-correct name and substitut symlinks by real modules)
 
 * #### examples/
+Simple games, that help you familiarize yourself with *instead-tools*. Script *unfold_all.sh* create folders in instead-projects directory (i.e "~/.instead/games") with this examples (change the names to *main.lua*) and add symlink for *useful.lua*

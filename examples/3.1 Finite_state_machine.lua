@@ -25,11 +25,11 @@ assault_rifle = stm {
 	nam = "Автомат";
 	var { 
 		may 		= true,			-- типо стрельбище, нужно получить разрешение инструктора
-		charge 	= 30;
+		charge 	= 5;
 	},
 	states = {
 		{ "Машинган", dsc = "На столе лежит {автомат}.", touch = "О, автомат", takable = true },
-		["В руках"] = { iam = true, touch = "Я сжимаю автомат", use = "Peow", reflexive = true },
+		["В руках"] = { iam = true, touch = _say("Я проверил магазин: %d", "charge"), use = "Peow", reflexive = true },
 		["Пустой"] = { nam = "Разряженный автомат", touch ="Я прямо чувствую, что он пуст, он легче" }; 
 	},
 	branches = { 		-- Обработчики переходов состояния. Если возвращена строка - это название нового состояния. Переход может быть безусловным (тогда прямо присваиваем строку обработчику)
@@ -38,11 +38,12 @@ assault_rifle = stm {
 		},
 		["В руках"] = {
 			use = function(s) 
-				if s.charge == 0 
-					then	return "Пустой" 
-					else	s.charge = s.charge - 1 
+				if s.charge > 0 
+					then	s.charge = s.charge - 1 
+					else	return "Пустой" 
 				end 
 			end,
+			check = function(s) if s.charge == 0 then return "Пустой" end end;
 		},
 	},
 }

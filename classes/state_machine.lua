@@ -39,7 +39,8 @@ end
 
 stm = function(v)
 	-- Prepare for construction
-	for _, field in ipairs { "desc", "dsc", "act", "take", "inv", "use", "used", "nouse", "enter", "exit", "entered", "left"} do
+	-- TODO советовать что использовать взамен
+	for _, field in ipairs { "disp", "dsc", "act", "take", "inv", "use", "used", "nouse", "enter", "exit", "entered", "left"} do
 		isErr( type(v[field]) ~= "nil", "You shouldn't use '" .. field .. "' field in your state machine" );
 	end
 
@@ -93,11 +94,24 @@ stm = function(v)
 	end
 	v.inv = function(s)
 		local inv = stm_select(s, s.current_state, "touch");
-		return tcall(inv)
+		local jumpTo = curr(s, true).check
+		jumpTo = tcall(jumpTo, s)
+
+		if jumpTo then
+			s.current_state = jumpTo
+		end
+
+		return tcall(inv, s)
 	end
 	v.use = function(s, w)												
 		local use = stm_select(s, s.current_state, "use");
-		return tcall(inv, w)
+		local jumpTo = curr(s, true).use
+		jumpTo = tcall(jumpTo, s)
+		if jumpTo then
+			s.current_state = jumpTo
+		end
+
+		return tcall(use, w)
 	end
 	v.used = function(s, w)
 		if curr(s).reflexive then

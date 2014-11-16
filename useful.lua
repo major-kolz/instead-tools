@@ -11,12 +11,6 @@
 --| ret = state and <exp1> or <exp2>  Если state истинно, то ret получит <exp1> иначе <exp2>. Из Programming on Lua 2ed, Ierusalimschy
 --| В строку темы default помещается 84 символа: 82 знака '*' и 2 '|'
 
-<<<<<<< HEAD
---| Чтобы можно было писать require "<clasnam>" и не копировать <clasnam>.lua в папку с проектом 
-stead.package.path = stead.package.path .. ";../instead-tools/classes/?.lua" 
-
-=======
->>>>>>> 1141b5227d56832921c6c0158084589ae9f6d258
 function isErr( cond, msg, lvl )			-- Лаконичная форма для отлова ошибок.   
 	if cond then								-- Если используете непосредственно в комнатах/объектах - передавайте '2' на месте lvl
 		error( msg, lvl or 3 )
@@ -108,4 +102,20 @@ function _trig ( cond, pos, neg )		-- Для двухступенчатых со
 end
 --}
 
+function _say ( phrase, value )
+	return function( s )
+		local t = type(value)
+		if t == "table" then
+			local open_values = {}
+			for _, v in ipairs( value ) do 
+				table.insert( open_values, s[v] )
+			end 
+			p( string.format(phrase, table.unpack(open_values)) )
+		elseif t == "string" then
+			p( string.format( phrase, s[value] ) );
+		else
+			error( "'_say' function get string or table of strings", 2 )
+		end
+	end 	
+end
 -- vim: set tabstop=3 shiftwidth=3 columns=133

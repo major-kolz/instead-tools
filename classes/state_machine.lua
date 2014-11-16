@@ -10,14 +10,20 @@ end
 
 local function curr(s, isBranches)	-- Get current machine's state/branch
 	local mod = isBranches and "branches" or "states"
-	return s[mod][ s.current_state ];
+	return s[mod][ s.current_state ] or {};
 end
 
 local function stm_select ( machine, state, field )
+	if field == "nam" or field == 1 then
+		if machine.states[state].iam then								-- Отображаемое имя объекта может совпадать с тэгом состояния
+			return state;
+		end
+	end
+	
 	local state_holder = machine.states[state]
 	isErr( state_holder == nil, "Your machine haven't state: " .. state );	-- Ошибка укажет на stm в этом файле, увы...
 	isErr( type( state_holder ) ~= "table", "Your machine state '" .. state .. "' isn't table" )
-
+	
 	local reaction = state_holder[field]
 	local def = machine.states.def or machine.states[1]
 	if not reaction then														-- У состояния опущено какое-то поле 
@@ -32,8 +38,8 @@ local function stm_select ( machine, state, field )
 	return reaction
 end
 
--- Дополнительные (и не наследуемые) свойства состояний:
--- takable				брать при первом touch
+-- Дополнительные поля состояний:
+-- takable				брать при первом touch (не наследуется)
 -- reflexive			use и used воспринимаются как одно и тоже (used переадресовывается)
 -- iam					название состояние совпадает с отображаемым именем
 
@@ -63,13 +69,9 @@ stm = function(v)
 
 	-- Build state machine
 	v.disp = function(s)
-		local disp = stm_select(s, s.current_state, "nam")		
+		local disp = stm_select(s, s.current_state, "nam")
 		if not disp then
-			if curr(s).iam then											-- Отображение имени объекта может совпадать с тэгом состояния
-				disp = s.current_state 
-			else 																-- Сокращенная форма, без присваивания в nam
-				disp = stm_select(s, s.current_state, 1)
-			end
+			disp = stm_select(s, s.current_state, 1)				-- Сокращенная форма, без присваивания в nam
 		end
 
 		return tcall( disp )												-- В случае disp==nil (безымянное состояния), используем v.nam

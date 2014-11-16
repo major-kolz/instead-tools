@@ -102,15 +102,16 @@ function _trig ( cond, pos, neg )		-- Для двухступенчатых со
 end
 --}
 
-function _say ( phrase, value )
-	return function( s )
+function _say ( phrase, value )			-- Создание обработчика-индикатора (показывают value-поле данного объекта)
+	return function( s )						-- Рекомендую для act - отображать внутренние счетчики в одну строчку
 		local t = type(value)
 		if t == "table" then
 			local open_values = {}
 			for _, v in ipairs( value ) do 
+				isErr( type(v) ~= "string", "Value may be string or table of strings" )
 				table.insert( open_values, s[v] )
 			end 
-			p( string.format(phrase, table.unpack(open_values)) )
+			p( string.format(phrase, stead.unpack(open_values)) )
 		elseif t == "string" then
 			p( string.format( phrase, s[value] ) );
 		else

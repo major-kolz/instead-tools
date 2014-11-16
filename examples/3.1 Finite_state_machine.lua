@@ -22,28 +22,25 @@ main = room {
 };
 
 assault_rifle = stm {
-	nam = "Автомат";
+	nam = "Пистоль";
 	var { 
 		may 		= true,			-- типо стрельбище, нужно получить разрешение инструктора
-		charge 	= 5;
+		charge 	= 4;
 	},
 	states = {
-		{ "Машинган", dsc = "На столе лежит {автомат}.", touch = "О, автомат", takable = true },
-		["В руках"] = { iam = true, touch = _say("Я проверил магазин: %d", "charge"), use = "Peow", reflexive = true },
-		["Пустой"] = { nam = "Разряженный автомат", touch ="Я прямо чувствую, что он пуст, он легче" }; 
+		{ "Пистолет", dsc = "На столе лежит {пистолет}.", touch = "Макаров...", takable = true },
+		["В руках"] = { iam = true, touch = _say("Я проверил магазин: %d", "charge"), use = "Peow" },
+		["Пустой"] = { nam = "Разряженный пистолет", touch ="Я прямо по весу чувствую, что пуст" }; 
 	},
 	branches = { 		-- Обработчики переходов состояния. Если возвращена строка - это название нового состояния. Переход может быть безусловным (тогда прямо присваиваем строку обработчику)
 		{
-			taked = function(s) if s.may then  return "В руках" end end,
+			taked = function(s) if s.may then return "В руках" end end,
 		},
 		["В руках"] = {
 			use = function(s) 
-				if s.charge > 0 
-					then	s.charge = s.charge - 1 
-					else	return "Пустой" 
-				end 
+				s.charge = s.charge - 1;
+				if s.charge == 0 then return "Пустой" end
 			end,
-			check = function(s) if s.charge == 0 then return "Пустой" end end;
 		},
 	},
 }

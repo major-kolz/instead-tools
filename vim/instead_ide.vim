@@ -1,3 +1,7 @@
+" Copyright 2014 Nikolay Konovalow
+" Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+" http://www.apache.org/licenses/LICENSE-2.0>
+
 " Не завершено
 
 nmap <C-c> :call MKC(0)<CR>

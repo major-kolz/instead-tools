@@ -1,3 +1,7 @@
+-- Copyright 2014 Nikolay Konovalow
+-- Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+-- http://www.apache.org/licenses/LICENSE-2.0>
+
 --$Name: Пример 3.1 Конечный автомат$
 --$Version: 0.1$
 --$Author: Николай Коновалов$

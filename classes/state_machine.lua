@@ -17,10 +17,12 @@ local function curr(s, isBranches)										-- Get current machine's state/branc
 	return s[mod][ s.current_state ] or {};
 end
 
+--TODO extends for branches
+
 local function stm_select ( machine, state, field )
 	if field == "nam" or field == 1 then
-		isErr( machine.states[state] == nil, "State '" .. state .. "' doesn't exist (".. machine.nam ..")" )
-		if machine.states[state].iam then							-- Отображаемое имя объекта может совпадать с тэгом состояния
+		isErr( machine.states[state] == nil, "State '" .. tostring(state) .. "' doesn't exist (".. machine.nam ..")" )
+		if stm_select(machine, machine.current_state,"iam") then -- Отображаемое имя объекта может совпадать с тэгом состояния
 			return state;
 		end
 	end
@@ -67,21 +69,24 @@ function stmJump( otherwise )												-- Безусловный обрабо�
 	end
 end
 
-function stm_handler( machine, handlerName, ... )
+function stm_handler( machine, handlerName, ... )					-- Показываем реакцию, проверяем условие изменения состояния
 	local handler = stm_select(machine, machine.current_state, handlerName)
 	local jumpTo;
 	
 	if handlerName == "touch" then
-		if curr(machine).bind then
-			local another = ref(curr(machine).bind)
-			another:call( machine )
-		elseif curr(machine).binds then
-			for _, obj in ipairs( curr(machine).binds ) do
-				ref(obj):call( machine )
+		local binding = stm_select(machine, machine.current_state, "bind")
+		if binding then														-- Обработчик одной stm может запускать обработчик у другой
+			ref(binding):call( machine )
+		else 
+			binding = stm_select(machine, machine.current_state, "binds")
+			if binding then													-- или нескольких сразу
+				for _, obj in ipairs( curr(machine).binds ) do
+					ref(obj):call( machine )
+				end
 			end
 		end
 
-		if curr(machine).takable then		-- takable - не наследуемое свойство состояния 
+		if curr(machine).takable then										-- взятие объекта
 			take(machine)
 			jumpTo = curr(machine, true).taked
 		else
@@ -91,7 +96,7 @@ function stm_handler( machine, handlerName, ... )
 		jumpTo = curr(machine, true)[handlerName]
 	end
 
-	jumpTo = tcall(jumpTo, machine, ...)								-- "разворачиваем" обработчик
+	jumpTo = tcall(jumpTo, machine, ...)								-- "разворачиваем" обработчик перехода
 	if jumpTo then
 		machine.stm_prevState, machine.current_state = machine.current_state, jumpTo
 	end	
@@ -107,10 +112,9 @@ end
 -- touch покрывает act, inv и tak классического API
 -- Имя не обязательно присваивать в nam, можно писать и так (из-за синтаксиса Lua это будет 1й элемент таблицы)
 -- init может быть строкой - тогда она интерпретируется как имя состояния, что должно быть начальным 
-
+-- TODO add 'nouse' handler
 stm = function(v)
 	-- Prepare for construction
-	-- TODO советовать что использовать взамен
 	local occupied = { "disp", "dsc", "act", "take", "inv", "use", "used", "nouse", "stm_prevState", "stm_savedState", "call" }
 	for _, field in ipairs(occupied) do
 		isErr( type(v[field]) ~= "nil", "You shouldn't use '" .. field .. "' field in your state machine" );
@@ -123,18 +127,17 @@ stm = function(v)
 	isErr( not(v.states.def), "Your state machine haven't default state. Put 'def={}' to 'states' if it correct")
 
 	for state, _ in pairs(v.branches) do 							-- Проверка на опечатки (или неиспользуемый код)
-		--- Может сработать в холостую, если мешать стиль состояния по умолчанию (явный - def - и неявный - просто {...})
 		isErr( v.states[state] == nil, "Machine's branches '" .. state .. "' written with mistake (or redundant)" );
 	end
 
 	stead.add_var(v, {stm_prevState = false, stm_savedState = false} )
 	if v.states.init then												-- current_state содержит тэг текущего состояния
-		if type(v.states.init) == "string" then
+		if type(v.states.init) == "string" then					-- Начальным состоянием можно задать, поместив тэг в init
 			stead.add_var( v, {current_state = v.states.init} )
-		else
+		else 																		-- или создать состояние с таким тэгом 
 			stead.add_var( v, {current_state = "init"} )					
 		end
-	elseif v.states.def then											-- Если не задан init, то первым состоянием будет def
+	elseif v.states.def then											-- Если не задан init, то начальным состоянием будет def
 		stead.add_var( v, {current_state = "def"} )				
 	end
 
@@ -148,14 +151,14 @@ stm = function(v)
 	end
 	v.dsc = function(s)
 		local dsc = tcall( stm_handler(s, "dsc") )
-		isErr( dsc == nil, "This state ('" .. s.current_state .. "', obj = " .. s.nam .. ") haven't dsc and can't be represented at scene" );
+		isErr( dsc == nil, "This state ('" .. s.current_state .. "', obj = " .. s.nam .. ") haven't dsc and can't be represented at scene. If it is correct - put 'dsc=true'" );
 		return dsc
 	end
 	v.act = function(s)
 		return tcall( stm_handler(s, "touch") ) or true
 	end
 	v.inv = function(s)
-		return tcall( stm_handler(s, "touch") )
+		return tcall( stm_handler(s, "touch") ) or true
 	end
 	v.use = function(s, w)	
 		return tcall( stm_handler(s, "use", w) ) or true
@@ -166,7 +169,7 @@ stm = function(v)
 		end
 		return tcall( stm_handler(s, "used", w) ) or true
 	end
-	v.call = function(s, w)
+	v.call = function(s, w)												-- Непрямое взаимодействие объектов (ружье и мишень, фонарик и тень)
 		return tcall( stm_handler(s, "call", w) )
 	end
 

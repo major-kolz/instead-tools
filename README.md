@@ -10,16 +10,16 @@ Code wrappers for high-usage constructions (selections from list by index, error
 * ##### cutscene.lua
 Modified [cutscene module](http://instead.syscall.ru/wiki/ru/gamedev/modules/cutscene)(ru). See changes-list at head of file.
 
-* ##### vim/lua.snippets
-My snippets for [Vim](www.vim.org/). I use [vim-snipmate](https://github.com/garbas/vim-snipmate) plugin for play it. First part of the file contain pure Lua construction, second - INSTEAD-specify snippets. At the end you can see snippets for my useful.lua.
+* ##### vim/
+Make my favorite [text editor](http://www.vim.org/) more suitable for INSTEAD's gamewritting
 
-* #### classes/
+* ##### classes/
 Quick constructor for some patterns of *obj*. Pattern covered: finite state machine.
 
-* #### minIDE/
+* ##### minIDE/
 Scripts, that simplify non-writting gamedeveloping.
 
-* #### examples/
+* ##### examples/
 Simple games, that help you familiarize yourself with *instead-tools*. Script *unfold_all.sh* create folders in instead-projects directory (i.e "~/.instead/games") with this examples (change the names to *main.lua*) and add symlink for *useful.lua*
 
 ## License

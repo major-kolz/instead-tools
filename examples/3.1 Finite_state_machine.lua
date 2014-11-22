@@ -32,21 +32,48 @@ assault_rifle = stm {
 		charge 	= 4;
 	},
 	states = {
-		{ "Пистолет", dsc = "На столе лежит {пистолет}.", touch = "Макаров...", takable = true },
-		["В руках"] = { iam = true, touch = _say("Я проверил магазин: %d", "charge"), use = "Peow" },
+		init = { 
+			dsc = "На столе лежит кобура с {пистолетом}.", 
+			touch = _if( "may", "\"Оружие в руки! К занятию - приступить!\"",
+				"Брать оружие без команды инструктора запрещено.");
+		},
+		
+		def = {},
+		["На столе"] = { "Пистолет", dsc = "На столе лежит {пистолет}.", touch = "Макаров...", takable = true },
+		["В руках"] = { iam = true, use = "Peow" },
 		["Пустой"] = { nam = "Разряженный пистолет", touch ="Я прямо по весу чувствую, что пуст" }; 
 	},
 	branches = { 		-- Обработчики переходов состояния. Если возвращена строка - это название нового состояния. Переход может быть безусловным (тогда прямо присваиваем строку обработчику)
-		{
-			taked = function(s) if s.may then return "В руках" end end,
-		},
+		init = { touch = function(s) if s.may then take(s); return "В руках" end end },
+
+		["На столе"] = { taked = stmPrev "В руках"; },
 		["В руках"] = {
-			use = function(s) 
-				s.charge = s.charge - 1;
-				if s.charge == 0 then return "Пустой" end
+			use = function(s, w)
+				if w == aim then
+					magazine.charge = magazine.charge - 1;
+					if magazine.charge == 0 then return "Пустой" end
+				end
 			end,
 		},
+		["Без магазина"] = {
+			used = function(s, w)
+				if w == magazine then
+					return s.stm_prevState
+				end
+			end;
+		}
 	},
+}
+
+magazine = stm {
+	nam = "Магазин",
+	var {
+		charge = 4
+	states = {
+		empthy = {},
+		def = {"Пистолетный магазин", touch = _say("В магазин: %d патронов", "charge"),  }
+		full = {},
+	}
 }
 
 aim = obj{

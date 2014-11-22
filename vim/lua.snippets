@@ -193,7 +193,7 @@ snippet objt blank
 snippet nam
 	nam = [[${1:Name}]],
 snippet dsc
-	dsc = [[${1:Description}]],
+	dsc = [[${1} {${2}} ${3}]],
 snippet act
 	act = [[${1:Action text}]],
 snippet use
@@ -239,13 +239,13 @@ snippet actf
 snippet usef
 	use = function(s, w)
 		if w == ${1:<that_obj>} then
-			${2};
+			${2}
 		end ${3}
 	end,
 snippet usedf
 	use = function(s, w)
 		if w == ${1:<that_obj>} then
-			${2};
+			${2}
 		end ${3}
 	end,
 snippet invf

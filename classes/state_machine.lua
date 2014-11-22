@@ -12,7 +12,7 @@ local function tcall(f, s)				-- wiki, "Приемы программирова�
 	end
 end
 
-local function curr(s, isBranches)	-- Get current machine's state/branch
+local function curr(s, isBranches)										-- Get current machine's state/branch
 	local mod = isBranches and "branches" or "states"
 	return s[mod][ s.current_state ] or {};
 end

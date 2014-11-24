@@ -19,19 +19,24 @@ end
 
 --TODO extends for branches
 
-local function stm_select ( machine, state, field )
-	local state_holder = machine.states[state]
-	isErr( state_holder == nil, 											-- Ошибка укажет на stm в этом файле, увы...
-			"Your machine ('".. machine.nam .."') haven't state: " .. state 
-			);
+local function stm_select ( machine, state, field, isBranches )
+	local mod = isBranches and "branches" or "states"
+	local state_holder = machine[mod][state]
+	isErr(state_holder==nil,"Your machine ('"..machine.nam.."') haven't state: "..state); -- Ошибка укажет на stm в этом файле(
 	isErr( type( state_holder ) ~= "table", "Your machine's state '" .. state .. "' isn't table" )
 	
+	if field == "nam" or field == 1 then								-- Проверяем, есть iam, потом имя, потом по предкам
+		if machine[mod][state].iam then								-- Отображаемое имя объекта может совпадать с тэгом состояния
+			return state
+		end
+	end
+
 	local reaction = state_holder[field]
-	local def = machine.states.def
+	local def = machine[mod].def
 	if not reaction then														-- У состояния опущено какое-то поле 
 		local parent = state_holder.extends
 		if parent then																-- состояние унаследовано - проверить поле предка
-			reaction = stm_select( machine, parent, field )
+			reaction = stm_select( machine, parent, field, isBranches )
 		else 																			-- проверить поле состояния по-умолчанию				
 			reaction = def[field]
 		end
@@ -64,18 +69,10 @@ end
 
 function stm_handler( machine, handlerName, ... )					-- Показываем реакцию, проверяем условие изменения состояния
 	local handler, jumpTo;
-
-	if handlerName == "nam" or handlerName == 1 then
-		isErr( curr(machine) == nil, "State '" .. tostring(state) .. "' doesn't exist (".. machine.nam ..")" )
-		if stm_select(machine, curr(machine), "iam") then			-- Отображаемое имя объекта может совпадать с тэгом состояния
-			handler = state;
-		end
-	else
-		handler = stm_select(machine, machine.current_state, handlerName)
-	end
+	handler = stm_select(machine, machine.current_state, handlerName)
 
 	if handlerName == "touch" then
-		local binding = stm_select(machine, machine.current_state, "bind")
+		local binding = stm_select(machine, machine.current_state, "bind")	-- bind & binds указываются в states
 		if binding then														-- Обработчик одной stm может запускать обработчик у другой
 			ref(binding):call( machine )
 		else 
@@ -125,7 +122,8 @@ stm = function(v)
 	isErr( v.states.default ~= nil, "Name of default state is 'def' instead of 'default'" )
 	isErr( type(v.states) ~= "table", "Your state machine haven't field 'states'" )
 	isErr( type(v.branches) ~= "table", "Your state machine haven't field 'branches'" )
-	isErr( not(v.states.def), "Your state machine haven't default state. Put 'def={}' to 'states' if it correct")
+	isErr( not(v.states.def), "Your state machine haven't default state. Put 'def={}' to 'states' for skipping")
+	isErr( not(v.branches.def), "Your state machine haven't default state. Put 'def={}' to 'branches' for skipping")
 
 	for state, _ in pairs(v.branches) do 							-- Проверка на опечатки (или неиспользуемый код)
 		isErr( v.states[state] == nil, "Machine's branches '" .. state .. "' written with mistake (or redundant)" );

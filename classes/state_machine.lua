@@ -20,15 +20,8 @@ end
 --TODO extends for branches
 
 local function stm_select ( machine, state, field )
-	if field == "nam" or field == 1 then
-		isErr( machine.states[state] == nil, "State '" .. tostring(state) .. "' doesn't exist (".. machine.nam ..")" )
-		if stm_select(machine, machine.current_state,"iam") then -- Отображаемое имя объекта может совпадать с тэгом состояния
-			return state;
-		end
-	end
-	
 	local state_holder = machine.states[state]
-	isErr( state_holder == nil, 										-- Ошибка укажет на stm в этом файле, увы...
+	isErr( state_holder == nil, 											-- Ошибка укажет на stm в этом файле, увы...
 			"Your machine ('".. machine.nam .."') haven't state: " .. state 
 			);
 	isErr( type( state_holder ) ~= "table", "Your machine's state '" .. state .. "' isn't table" )
@@ -70,9 +63,17 @@ function stmJump( otherwise )												-- Безусловный обрабо�
 end
 
 function stm_handler( machine, handlerName, ... )					-- Показываем реакцию, проверяем условие изменения состояния
-	local handler = stm_select(machine, machine.current_state, handlerName)
-	local jumpTo;
-	
+	local handler, jumpTo;
+
+	if handlerName == "nam" or handlerName == 1 then
+		isErr( curr(machine) == nil, "State '" .. tostring(state) .. "' doesn't exist (".. machine.nam ..")" )
+		if stm_select(machine, curr(machine), "iam") then			-- Отображаемое имя объекта может совпадать с тэгом состояния
+			handler = state;
+		end
+	else
+		handler = stm_select(machine, machine.current_state, handlerName)
+	end
+
 	if handlerName == "touch" then
 		local binding = stm_select(machine, machine.current_state, "bind")
 		if binding then														-- Обработчик одной stm может запускать обработчик у другой
@@ -86,7 +87,7 @@ function stm_handler( machine, handlerName, ... )					-- Показываем р
 			end
 		end
 
-		if curr(machine).takable then										-- взятие объекта
+		if curr(machine).takable then										-- Обработчик может инициировать взятие объекта
 			take(machine)
 			jumpTo = curr(machine, true).taked
 		else

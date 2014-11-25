@@ -67,6 +67,12 @@ function stmJump( otherwise )												-- Безусловный обрабо�
 	end
 end
 
+function stmUnswer( reactions )
+	return function( s, w )
+		return reactions[deref(w)] or reaction.def or true;
+	end
+end
+
 function stm_handler( machine, handlerName, ... )					-- Показываем реакцию, проверяем условие изменения состояния
 	local handler, jumpTo;
 	handler = stm_select(machine, machine.current_state, handlerName)

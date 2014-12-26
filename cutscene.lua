@@ -14,7 +14,8 @@ require "timer"
 require "xact"
 
 local function get_token(txt, pos)
-	local s, e = tonumber(pos) or 1;
+	pos = tonumber(pos) or 1;
+	local s, e;
 	e = pos
 	while true do
 		s, e = txt:find("[\\{]", e);

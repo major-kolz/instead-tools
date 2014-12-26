@@ -67,7 +67,7 @@ function stm_handler( machine, handlerName, ... )					-- Показываем р
 
 	if handlerName == "nam" or handlerName == 1 then
 		isErr( curr(machine) == nil, "State '" .. tostring(state) .. "' doesn't exist (".. machine.nam ..")" )
-		if stm_select(machine, curr(machine), "iam") then			-- Отображаемое имя объекта может совпадать с тэгом состояния
+		if stm_select(machine,machine.current_state,"iam") then	-- Отображаемое имя объекта может совпадать с тэгом состояния
 			handler = state;
 		end
 	else

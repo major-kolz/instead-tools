@@ -65,7 +65,7 @@ cutscene = function(v)
 	v.forcedsc = true
 	v._cutPrefix = v._cutPrefix or "^^";			-- предварять cut-кнопку пустой строкой
 	v._cutDefTxt = v._cutDefTxt or ">>>";			-- определим внешний вид cut-кнопки (наверное, можно и картинку через img ) 
-	v._readFrom = 1;					-- счетчик для не отображаемой (просмотренной) части
+	v._readFrom = 1;										-- счетчик для не отображаемой (просмотренной) части
 
 	v.update = v.update or function() return false end;
 	v.left_react = "";

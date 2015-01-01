@@ -106,21 +106,25 @@ function _trig ( cond, pos, neg )		-- Для двухступенчатых со
 end
 --}
 
-function _say ( phrase, value )			-- Создание обработчика-индикатора (показывают value-поле данного объекта)
-	return function( s )						-- Рекомендую для act - отображать внутренние счетчики в одну строчку
-		local t = type(value)
-		if t == "table" then
+function _say ( phrase, value )			-- Создание обработчика-индикатора (показывают value-поле[/поля] данного объекта)
+	-- Рекомендую для act - отображать внутренние счетчики в одну строчку
+	-- Строчка формируется заполнителями %<...> в C-стиле
+	isErr( not string.match(phrase, '%'), "'phrase'-parameter haven't  format specifier '%'. If it's correct - why '_say'?" )
+	local react;								 
+	local t = type(value)
+	if t == "table" then
+		for _, v in ipairs( value ) do isErr( type(v) ~= "string", "Value may be string or table of strings" ) end
+		react = function( s )						
 			local open_values = {}
-			for _, v in ipairs( value ) do 
-				isErr( type(v) ~= "string", "Value may be string or table of strings" )
-				table.insert( open_values, s[v] )
-			end 
+			for _, v in ipairs( value ) do table.insert( open_values, s[v] ) end 
 			p( string.format(phrase, stead.unpack(open_values)) )
-		elseif t == "string" then
-			p( string.format( phrase, s[value] ) );
-		else
-			error( "'_say' function get string or table of strings", 2 )
 		end
-	end 	
+	elseif t == "string" then
+		react = function(s) p( string.format( phrase, s[value] ) ); end
+	else
+		error( "'_say' function get string or table of strings", 2 )
+	end
+
+	return react 	
 end
 -- vim: set tabstop=3 shiftwidth=3 columns=133

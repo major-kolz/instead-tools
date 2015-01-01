@@ -17,17 +17,16 @@ local function curr(s, isBranches)										-- Get current machine's state/branc
 	return s[mod][ s.current_state ] or {};
 end
 
---TODO extends for branches
-
-local function stm_select ( machine, state, field )
-	local state_holder = machine.states[state]
+local function stm_select ( machine, state, field, mod )
+	mod = mod or "states"
+	local state_holder = machine[mod][state]
 	isErr( state_holder == nil, 											-- Ошибка укажет на stm в этом файле, увы...
 			"Your machine ('".. machine.nam .."') haven't state: " .. state 
 			);
 	isErr( type( state_holder ) ~= "table", "Your machine's state '" .. state .. "' isn't table" )
 	
 	local reaction = state_holder[field]
-	local def = machine.states.def
+	local def = machine[mod].def
 	if not reaction then														-- У состояния опущено какое-то поле 
 		local parent = state_holder.extends
 		if parent then																-- состояние унаследовано - проверить поле предка
@@ -89,12 +88,12 @@ function stm_handler( machine, handlerName, ... )					-- Показываем р
 
 		if curr(machine).takable then										-- Обработчик может инициировать взятие объекта
 			take(machine)
-			jumpTo = curr(machine, true).taked
+			jumpTo = stm_select(machine, machine.current_state, "taked", "branches");
 		else
-			jumpTo = curr(machine, true).touch
+			jumpTo = stm_select(machine, machine.current_state, "touch", "branches");
 		end
 	else
-		jumpTo = curr(machine, true)[handlerName]
+		jumpTo = stm_select(machine, machine.current_state, handlerName, "branches");
 	end
 
 	jumpTo = tcall(jumpTo, machine, ...)								-- "разворачиваем" обработчик перехода
@@ -112,7 +111,7 @@ end
 
 -- touch покрывает act, inv и tak классического API
 -- Имя не обязательно присваивать в nam, можно писать и так (из-за синтаксиса Lua это будет 1й элемент таблицы)
--- init может быть строкой - тогда она интерпретируется как имя состояния, что должно быть начальным 
+-- init - начальное состояние конечного автомата. Может быть ссылкой - хранить строку-имя начального состояния 
 -- TODO add 'nouse' handler
 stm = function(v)
 	-- Prepare for construction

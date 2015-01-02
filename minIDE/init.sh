@@ -4,8 +4,11 @@
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # http://www.apache.org/licenses/LICENSE-2.0>
 
-# Path to instead-tools' minIDE directory 
+# Create and prepare new directory for INSTEAD game
+
+# Path to instead-tools directory 
 source="$HOME/.instead/games/instead-tools"
+# This file (init.sh) should be at ~/.instead/games
 current=$( dirname "$0" )
 
 mkdir "$current/newOne"

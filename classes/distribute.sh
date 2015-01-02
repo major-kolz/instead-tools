@@ -4,11 +4,12 @@
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # http://www.apache.org/licenses/LICENSE-2.0>
 
+# Make 'classes' available by simple "require <classname>"
 
 current=$( dirname "$0" )
 stead="$HOME/.instead/stead"
 
-if ! [ -e "$i" ]
+if ! [ -e "$stead" ]
 then
 	mkdir "$stead"
 fi

@@ -109,7 +109,6 @@ end
 function _say ( phrase, value )			-- Создание обработчика-индикатора (показывают value-поле[/поля] данного объекта)
 	-- Рекомендую для act - отображать внутренние счетчики в одну строчку
 	-- Строчка формируется заполнителями %<...> в C-стиле
-	isErr( not string.match(phrase, '%'), "'phrase'-parameter haven't  format specifier '%'. If it's correct - why '_say'?" )
 	local react;								 
 	local t = type(value)
 	if t == "table" then

@@ -14,7 +14,7 @@ format.para 	= true;			-- Отступы в начале абзаца;
 format.dash 	= true;			-- Замена двойного минуса на длинное тире;
 format.quotes 	= true;			-- Замена " " на типографские << >>;
 
-require "useful"
+require"useful"					-- набор полезных функций
 require "state_machine"			-- файл state_machine.lua должен находиться в папке игры или в <instead>/stead/
 
 main = room {

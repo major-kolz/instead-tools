@@ -4,7 +4,7 @@
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # http://www.apache.org/licenses/LICENSE-2.0>
 
-# Create and prepare new directory for INSTEAD game
+	# Create and prepare new directory for INSTEAD game 
 
 # Path to instead-tools directory 
 source="$HOME/.instead/games/instead-tools"
@@ -14,8 +14,11 @@ current=$( dirname "$0" )
 mkdir "$current/newOne"
 touch "$current/newOne/main.lua"
 
-# codeword for lua's snippet, help with headline
+# Codeword for lua's snippet, help with headline
 echo "insteadbegin" >> "$current/newOne/main.lua"
-
+# Script, that pack your game for distribution
 ln -s "$source/minIDE/assist.sh" "$current/newOne"
-ln -s "$source/useful.lua" "$current/newOne"
+# Additional files
+cp -n -s "$source/minIDE/readme-unix.txt" "$current/newOne"
+cp -n -s "$source/minIDE/readme-windows.txt" "$current/newOne"
+# TODO Licensing

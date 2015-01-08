@@ -17,12 +17,21 @@ local function curr(s, isBranches)										-- Get current machine's state/branc
 	return s[mod][ s.current_state ] or {};
 end
 
+<<<<<<< HEAD
 --TODO extends for branches
 
 local function stm_select ( machine, state, field, isBranches )
 	local mod = isBranches and "branches" or "states"
 	local state_holder = machine[mod][state]
 	isErr(state_holder==nil,"Your machine ('"..machine.nam.."') haven't state: "..state); -- Ошибка укажет на stm в этом файле(
+=======
+local function stm_select ( machine, state, field, mod )
+	mod = mod or "states"
+	local state_holder = machine[mod][state]
+	isErr( state_holder == nil, 											-- Ошибка укажет на stm в этом файле, увы...
+			"Your machine ('".. machine.nam .."') haven't state: " .. state 
+			);
+>>>>>>> ecfb0283417f8f71de5522fd35de8a7540747904
 	isErr( type( state_holder ) ~= "table", "Your machine's state '" .. state .. "' isn't table" )
 	
 	if field == "nam" or field == 1 then								-- Проверяем, есть iam, потом имя, потом по предкам
@@ -75,7 +84,19 @@ end
 
 function stm_handler( machine, handlerName, ... )					-- Показываем реакцию, проверяем условие изменения состояния
 	local handler, jumpTo;
+<<<<<<< HEAD
 	handler = stm_select(machine, machine.current_state, handlerName)
+=======
+
+	if handlerName == "nam" or handlerName == 1 then
+		isErr( curr(machine) == nil, "State '" .. tostring(state) .. "' doesn't exist (".. machine.nam ..")" )
+		if stm_select(machine,machine.current_state,"iam") then	-- Отображаемое имя объекта может совпадать с тэгом состояния
+			handler = state;
+		end
+	else
+		handler = stm_select(machine, machine.current_state, handlerName)
+	end
+>>>>>>> ecfb0283417f8f71de5522fd35de8a7540747904
 
 	if handlerName == "touch" then
 		local binding = stm_select(machine, machine.current_state, "bind")	-- bind & binds указываются в states
@@ -92,12 +113,12 @@ function stm_handler( machine, handlerName, ... )					-- Показываем р
 
 		if curr(machine).takable then										-- Обработчик может инициировать взятие объекта
 			take(machine)
-			jumpTo = curr(machine, true).taked
+			jumpTo = stm_select(machine, machine.current_state, "taked", "branches");
 		else
-			jumpTo = curr(machine, true).touch
+			jumpTo = stm_select(machine, machine.current_state, "touch", "branches");
 		end
 	else
-		jumpTo = curr(machine, true)[handlerName]
+		jumpTo = stm_select(machine, machine.current_state, handlerName, "branches");
 	end
 
 	jumpTo = tcall(jumpTo, machine, ...)								-- "разворачиваем" обработчик перехода
@@ -115,7 +136,7 @@ end
 
 -- touch покрывает act, inv и tak классического API
 -- Имя не обязательно присваивать в nam, можно писать и так (из-за синтаксиса Lua это будет 1й элемент таблицы)
--- init может быть строкой - тогда она интерпретируется как имя состояния, что должно быть начальным 
+-- init - начальное состояние конечного автомата. Может быть ссылкой - хранить строку-имя начального состояния 
 -- TODO add 'nouse' handler
 stm = function(v)
 	-- Prepare for construction

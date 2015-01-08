@@ -73,10 +73,6 @@ snippet elif
 		${2:-- Code}
 #
 # ===Оформление текста
-snippet '
-	'${1}'
-snippet "
-	"${1}"
 snippet [[
 	[[${1}]]${2:;}
 # Позволяет добавлять новую строку в списки аргументов/таблиц (после печати n/l нужно жать tab два раза, почему-то)
@@ -104,7 +100,7 @@ snippet insteadbegin
 	--$Version: 0.1
 	--$Author: ${2:major kolz}$
 
-	instead_version "1.9.1";
+	instead_version "`system("instead -version")`";
 
 	require 'xact'
 	require 'format'
@@ -112,13 +108,13 @@ snippet insteadbegin
 	format.dash 	= true;			-- Замена двойного минуса на длинное тире;
 	format.quotes 	= true;			-- Замена " " на типографские << >>;
 
-	dofile 'useful.lua'
+	require 'useful'
 	
 	main = room {
 		nam = ${3:'...'},
 		dsc = ${4:nil};
 		enter = function()
-			walk "${5: first_game_room}";
+			walk "${5:first_game_room}";
 		end,
 	};
 

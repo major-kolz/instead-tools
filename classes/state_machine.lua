@@ -12,21 +12,20 @@ local function tcall(f, ...)						-- wiki, "Приемы программиро�
 	end
 end
 
-local function curr(s, isBranches)										-- Get current machine's state/branch
+local function stm_curr(s, isBranches)										-- Get current machine's state/branch
 	local mod = isBranches and "branches" or "states"
 	return s[mod][ s.current_state ] or {};
 end
 
-local function stm_select ( machine, state, field, mod )
-	mod = mod or "states"
-	local state_holder = machine[mod][state]
+local function stm_select ( machine, state, field )
+	local state_holder = machine.states[state]
 	isErr( state_holder == nil, 											-- Ошибка укажет на stm в этом файле, увы...
-			"Your machine ('".. machine.nam .."') haven't state: " .. state 
+			"Your machine '".. deref(machine) .."' haven't state: " .. state 
 			);
 	isErr( type( state_holder ) ~= "table", "Your machine's state '" .. state .. "' isn't table" )
 	
 	local reaction = state_holder[field]
-	local def = machine[mod].def
+	local def = machine.states.def
 	if not reaction then														-- У состояния опущено какое-то поле 
 		local parent = state_holder.extends
 		if parent then																-- состояние унаследовано - проверить поле предка
@@ -39,33 +38,11 @@ local function stm_select ( machine, state, field, mod )
 	return reaction
 end
 
-function stmPrev( initial_branch )										-- Безусловный обработчик перехода назад
-	return function( machine )												-- Если требуется переход при выполнении условия.
-		if machine.stm_prevState then											-- то лучше писать обработчик самому
-			return machine.stm_prevState										-- Прошлое значение вызывается этой строкой
-		else
-			isErr( initial_branch == nil, "This state machine haven't previous state! For avoid it specify 'stmPrev(<state>)'" )
-			return initial_branch
-		end
-	end
-end
-
-function stmJump( otherwise )												-- Безусловный обработчик перехода на сохраненное состояние
-	return function( machine )
-		if machine.stm_savedState then
-			return machine.stm_savedState
-		else
-			isErr( otherwise == nil, "This state machine haven't saved state! For avoid it specify 'stmJump(<state>)'" )
-			return otherwise 
-		end
-	end
-end
-
-function stm_handler( machine, handlerName, ... )					-- Показываем реакцию, проверяем условие изменения состояния
+local function stm_handler( machine, handlerName, ... )			-- Показываем реакцию, проверяем условие изменения состояния
 	local handler, jumpTo;
 
 	if handlerName == "nam" or handlerName == 1 then
-		isErr( curr(machine) == nil, "State '" .. tostring(state) .. "' doesn't exist (".. machine.nam ..")" )
+		isErr( stm_curr(machine) == nil, "State '" .. tostring(state) .. "' doesn't exist (".. deref(machine) ..")" )
 		if stm_select(machine,machine.current_state,"iam") then	-- Отображаемое имя объекта может совпадать с тэгом состояния
 			handler = state;
 		end
@@ -80,20 +57,20 @@ function stm_handler( machine, handlerName, ... )					-- Показываем р
 		else 
 			binding = stm_select(machine, machine.current_state, "binds")
 			if binding then													-- или нескольких сразу
-				for _, obj in ipairs( curr(machine).binds ) do
+				for _, obj in ipairs( stm_curr(machine).binds ) do
 					ref(obj):call( machine )
 				end
 			end
 		end
 
-		if curr(machine).takable then										-- Обработчик может инициировать взятие объекта
+		if stm_curr(machine).takable then										-- Обработчик может инициировать взятие объекта
 			take(machine)
-			jumpTo = stm_select(machine, machine.current_state, "taked", "branches");
+			jumpTo = stm_curr(machine, true).taked
 		else
-			jumpTo = stm_select(machine, machine.current_state, "touch", "branches");
+			jumpTo = stm_curr(machine, true).touch
 		end
 	else
-		jumpTo = stm_select(machine, machine.current_state, handlerName, "branches");
+		jumpTo = stm_curr(machine, true)[handlerName]
 	end
 
 	jumpTo = tcall(jumpTo, machine, ...)								-- "разворачиваем" обработчик перехода
@@ -115,10 +92,11 @@ end
 -- TODO add 'nouse' handler
 stm = function(v)
 	-- Prepare for construction
-	local occupied = { "disp", "dsc", "act", "take", "inv", "use", "used", "nouse", "stm_prevState", "stm_savedState", "call" }
+	local occupied = { "disp","dsc","act","take","inv","use","used","nouse","stm_prevState","stm_savedState","call" }
 	for _, field in ipairs(occupied) do
 		isErr( type(v[field]) ~= "nil", "You shouldn't use '" .. field .. "' field in your state machine" );
 	end
+	v.nam = v.nam or "name no need";
 
 	isErr( v.states.initial ~= nil, "Name of initial state is 'init' instead of 'initial'" )
 	isErr( v.states.default ~= nil, "Name of default state is 'def' instead of 'default'" )
@@ -142,16 +120,17 @@ stm = function(v)
 	end
 
 	-- Build state machine
-	v.disp = function(s)													-- В случае disp==nil (безымянное состояния), используем v.nam
+	v.disp = function(s)
 		local disp = tcall( stm_handler(s, "nam") )
 		if not disp then
 			disp = tcall( stm_handler(s, 1) )
+			isErr( not disp, "Current state " .. s.current_state .. " of '" .. deref(s) .. "' haven't name (state 'def', too" )
 		end
 		return disp
 	end
 	v.dsc = function(s)
 		local dsc = tcall( stm_handler(s, "dsc") )
-		isErr( dsc == nil, "This state ('" .. s.current_state .. "', obj = " .. s.nam .. ") haven't dsc and can't be represented at scene. If it is correct - put 'dsc=true'" );
+		isErr( dsc == nil, "This state ('" .. s.current_state .. "', obj = " .. deref(s) .. ") haven't dsc and can't be represented at scene. If it is correct - put 'dsc=true'" );
 		return dsc
 	end
 	v.act = function(s)
@@ -164,7 +143,7 @@ stm = function(v)
 		return tcall( stm_handler(s, "use", w) ) or true
 	end
 	v.used = function(s, w)
-		if curr(s).reflexive then
+		if stm_curr(s).reflexive then
 			return s.use(w, s);
 		end
 		return tcall( stm_handler(s, "used", w) ) or true
@@ -174,4 +153,31 @@ stm = function(v)
 	end
 
 	return obj(v)
+end
+
+function stmPrev( initial_branch )					-- Безусловный обработчик перехода назад
+	return function( machine )							-- Если требуется переход при выполнении условия.
+		if machine.stm_prevState then						-- то лучше писать обработчик самому
+			return machine.stm_prevState					-- Прошлое значение вызывается этой строкой
+		else
+			isErr( initial_branch == nil, "This state machine haven't previous state! For avoid it specify 'stmPrev(<state>)'" )
+			return initial_branch
+		end
+	end
+end
+
+function stmJump( otherwise )							-- Безусловный обработчик перехода на сохраненное состояние
+	return function( machine )
+		if machine.stm_savedState then
+			return machine.stm_savedState
+		else
+			isErr( otherwise == nil, "This state machine haven't saved state! For avoid it specify 'stmJump(<state>)'" )
+			return otherwise 
+		end
+	end
+end
+
+function stmTak( dsc, tak, used )					-- Короткая форма для создания состояния. Так как нет имени переход в branches обязателен!
+	isErr( not string.match(dsc, "{.*}"), "Do you forgot {<link>} in dsc?" ) 
+	return { dsc = dsc, touch = tak, used = used, takable = true }
 end

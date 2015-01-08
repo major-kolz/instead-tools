@@ -13,6 +13,7 @@ reqs=$( grep -o "require[ ]*['\"]\(.*\)['\"]" "$current/main.lua" )
 modules=$( sed -n "s/['\"]//gp" <<< $(sed -n "s/require[ ]*//gp" <<< "$reqs") )
 for modname in $modules 
 do
+	# TODO if required 'debug' - del this string
 	if ! [ -e "$current/$modname.lua" ]
 	then
 		if [ -e "$stead/$modname.lua" ]

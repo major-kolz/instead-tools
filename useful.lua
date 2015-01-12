@@ -106,20 +106,47 @@ function _trig ( cond, pos, neg )		-- Для двухступенчатых со
 end
 --}
 
-function _say ( phrase, value )			-- Создание обработчика-индикатора (показывают value-поле[/поля] данного объекта)
+function _say ( phrase, ... )				-- Создание обработчика-индикатора (показывают value-поле[/поля] данного объекта)
 	-- Рекомендую для act - отображать внутренние счетчики в одну строчку
 	-- Строчка формируется заполнителями %<...> в C-стиле
-	local react;								 
-	local t = type(value)
-	if t == "table" then
+	-- Или, непосредственно в phrase, вписать имена отображаемых переменных с префиксом @ (пример: @count)
+	local value = {...}
+	print( value )
+	local react;				
+	
+	if value == nil then
+		local start, finish;
+		local txt = {};
+		local var = {};
+		while phr ~= nil do
+			start, finish= string.find( phrase, "@[a-zA-z]*" )
+
+			if start == nil or finish == nil then break end
+
+			table.insert( txt, string.sub( phrase, 1, start-1 ));
+			table.insert( var, string.sub( phrase, start+1, finish )); 
+			phrase = string.sub( phrase, finish+1 )
+		end
+		react = function( s )
+			local handler = ""
+			for i = 1, #var do 
+				handler = handler .. txt[i] .. s[var[i]]
+			end
+			if #txt == #var then
+				p( handler );
+			else
+				p( handler .. txt[#txt] )
+			end
+		end
+	elseif #value > 1 then
 		for _, v in ipairs( value ) do isErr( type(v) ~= "string", "Value may be string or table of strings" ) end
 		react = function( s )						
 			local open_values = {}
 			for _, v in ipairs( value ) do table.insert( open_values, s[v] ) end 
 			p( string.format(phrase, stead.unpack(open_values)) )
 		end
-	elseif t == "string" then
-		react = function(s) p( string.format( phrase, s[value] ) ); end
+	elseif type(value[1]) == "string" then
+		react = function(s) p( string.format( phrase, s[value[1]] ) ); end
 	else
 		error( "'_say' function get string or table of strings", 2 )
 	end

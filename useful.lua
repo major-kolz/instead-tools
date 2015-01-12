@@ -108,14 +108,11 @@ end
 --}
 
 function _say ( phrase, ... )				-- Создание обработчика-индикатора (показывают value-поле[/поля] данного объекта)
-	-- Рекомендую для act - отображать внутренние счетчики в одну строчку
-	-- Строчка формируется заполнителями %<...> в C-стиле
-	-- Или, непосредственно в phrase, вписать имена отображаемых переменных с префиксом @ (пример: @count)
+	-- Рекомендую для act/inv - отображать внутренние счетчики в одну строчку
 	local value = {...}
-	print( value )
 	local react;				
 	
-	if value == nil then
+	if value == nil then						-- Короткая форма: строка, отображаемые поля помечаются @ (пример: "Кокосов: @count")
 		local start, finish;
 		local txt = {};
 		local var = {};
@@ -130,26 +127,21 @@ function _say ( phrase, ... )				-- Создание обработчика-ин
 		end
 		react = function( s )
 			local handler = ""
-			for i = 1, #var do 
-				handler = handler .. txt[i] .. s[var[i]]
-			end
-			if #txt == #var then
-				p( handler );
-			else
-				p( handler .. txt[#txt] )
-			end
+
+			for i = 1, #var do handler = handler .. txt[i] .. s[var[i]]	end
+
+			if #txt == #var then p( handler );
+			else                 p( handler .. txt[#txt] )	end
 		end
-	elseif #value > 1 then
+	elseif #value > 0 then				-- Расширенная форма с заполнителями в С-стиле %<...> 
 		for _, v in ipairs( value ) do isErr( type(v) ~= "string", "Value may be string or table of strings" ) end
 		react = function( s )						
 			local open_values = {}
 			for _, v in ipairs( value ) do table.insert( open_values, s[v] ) end 
 			p( string.format(phrase, stead.unpack(open_values)) )
 		end
-	elseif type(value[1]) == "string" then
-		react = function(s) p( string.format( phrase, s[value[1]] ) ); end
 	else
-		error( "'_say' function get string or table of strings", 2 )
+		error( "Check '_say' second argument's: it should be string and (optional) fields' name (strings too)", 2 )
 	end
 
 	return react 	

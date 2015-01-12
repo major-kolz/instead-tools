@@ -25,7 +25,7 @@ local function stm_select ( machine, state, field )
 	isErr( type( state_holder ) ~= "table", "Your machine's state '" .. state .. "' isn't table" )
 	
 	if field == "nam" or field == 1 then								-- Проверяем, есть iam, потом имя, потом по предкам
-		if machine[mod][state].iam then								-- Отображаемое имя объекта может совпадать с тэгом состояния
+		if machine.states[state].iam then								-- Отображаемое имя объекта может совпадать с тэгом состояния
 			return state
 		end
 	end
@@ -110,7 +110,6 @@ stm = function(v)
 	isErr( type(v.states) ~= "table", "Your state machine haven't field 'states'" )
 	isErr( type(v.branches) ~= "table", "Your state machine haven't field 'branches'" )
 	isErr( not(v.states.def), "Your state machine haven't default state. Put 'def={}' to 'states' for skipping")
-	isErr( not(v.branches.def), "Your state machine haven't default state. Put 'def={}' to 'branches' for skipping")
 
 	for state, _ in pairs(v.branches) do 							-- Проверка на опечатки (или неиспользуемый код)
 		isErr( v.states[state] == nil, "Machine's branches '" .. state .. "' written with mistake (or redundant)" );

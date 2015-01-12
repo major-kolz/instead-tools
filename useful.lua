@@ -21,17 +21,18 @@ function isErr( cond, msg, lvl )			-- Лаконичная форма для о�
 	end
 end
 
-function offset_ (size) 					-- Вывести отступ указанной размерности (в пикселях)
+function offset_( size ) 					-- Вывести отступ указанной размерности (в пикселях)
 	isErr( size == nil or size < 0, "Недопустимая величина отступа: " .. (size or 'nil') );
 	return img("blank:" .. size .."x1");
 end
 
-function prnd_ (var)							-- Возвращает случайную реплику из набора var	
-	return var[ rnd(#var) ];
+function prnd_( phrases )					-- Возвращает случайную реплику из набора phrases
+	isErr( type(phrases) ~= "table", "'prnd' get table as argument" ) 
+	return phrases[ rnd(#phrases) ];
 end
 
-function prnd (var)
-	p (var[ rnd(#var) ]);
+function prnd( phrases )
+	p( prnd_(phrases) )
 end
 
 function floor_ (num, round_to)			-- Возвращает num с точностью до round_to знака после запятой 

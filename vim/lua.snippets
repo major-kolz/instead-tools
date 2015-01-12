@@ -100,27 +100,32 @@ snippet --=2
 snippet insteadbegin
 	--$Name: ${1:Game name}$
 	--$Version: 0.1
-	--$Author: ${2:major kolz}$
+	--$Author: ${2:Author}
 
 	instead_version "`system("instead -version")`";
 
+	require 'useful'					-- Набор полезных функций
 	require 'xact'
 	require 'format'
 	format.para 	= true;			-- Отступы в начале абзаца;
 	format.dash 	= true;			-- Замена двойного минуса на длинное тире;
 	format.quotes 	= true;			-- Замена " " на типографские << >>;
 
-	require 'useful'
-	
 	main = room {
-		nam = ${3:'...'},
-		dsc = ${4:nil};
-		enter = function()
-			walk "${5:first_game_room}";
-		end,
+		nam = '...',
+		forcedsc = true;
+		dsc = txtr [["$1"]] .. txtr[[^Автор: $2]] ..
+			[[${3}]]
+			.. [[^^Если это ваша первая {instead|INSTEAD}-игра - пройдите сперва {intro|обучение}.]],
+		obj = { 
+			vway("next", "^^^^^^^^^^^^{> Начать игру!}", '${4:first_game_room}'),
+			xact( "insteados", "Сборник игр-рассказов на тематику космического путешествия - очень советую :)" ),
+			xact( "instead", "http://instead.syscall.ru/" ),
+			xact( "intro", "Для перехода нажмите Esc, выберите пункт \"Выбор игры\" и \"Обучение\"" );
+		},
 	};
 
-	$5 = room${6}
+	$4 = room${5}
 #
 # ===Базовые конструкции
 snippet room
@@ -186,37 +191,37 @@ snippet objt blank
 #
 # ===Текстовые поля
 snippet nam
-	nam = [[${1:Name}]],${0}
+	nam = [[${1:Name}]],
 snippet dsc
-	dsc = [[${1} {${2}} ${3}]],${0}
+	dsc = [[${1} {${2}} ${3}]],
 snippet act
-	act = [[${1:Action text}]],${0}
+	act = [[${1:Action text}]],
 snippet use
-	use = [[${1:Use text}]],${0}
+	use = [[${1:Use text}]],
 snippet used
-	used = [[${1:Used text}]],${0}
+	used = [[${1:Used text}]],
 snippet enter
-	enter = [[${1:Enter text}]],${0}
+	enter = [[${1:Enter text}]],
 snippet entered
-	entered = [[${1:Entered text}]],${0}
+	entered = [[${1:Entered text}]],
 snippet exit
-	exit = [[${1:Exit text}]],${0}
+	exit = [[${1:Exit text}]],
 snippet left
-	left = [[${1:Left text}]],${0}
+	left = [[${1:Left text}]],
 snippet inv
-	inv = [[${1:Inventory text}]],${0}
+	inv = [[${1:Inventory text}]],
 snippet tak
-	tak = [[${1:Take text}]],${0}
+	tak = [[${1:Take text}]],
 snippet disp
-	disp = [[${1:Display text}]],${0}
+	disp = [[${1:Display text}]],
 snippet pic
-	pic = [[${1:gfx/pic.png}]],${0}
+	pic = [[${1:gfx/pic.png}]],
 snippet xdsc
-	xdsc = [[${1:Description}]],${0}
+	xdsc = [[${1:Description}]],
 snippet life
-	life = [[${1:Life text}]],${0}
+	life = [[${1:Life text}]],
 snippet where
-	where = [[${1:Where room}]],${0}
+	where = [[${1:Where room}]],
 #
 # ===Функциональные поля
 snippet namf
@@ -238,7 +243,7 @@ snippet usef
 		end ${3}
 	end,
 snippet usedf
-	use = function(s, w)
+	used = function(s, w)
 		if w == ${1:<that_obj>} then
 			${2}
 		end ${3}
@@ -369,7 +374,7 @@ snippet switch
 		"${2}",
 		"${3}",
 		"${4}";${0}
-		def = ${5:function() error "Событие не должно произойти" end};
+		def = ${5:function() error ("Событие не должно произойти: " .. $1) end};
 	}
 snippet _iflink
 	_if( "_${1}",

@@ -26,13 +26,9 @@ function offset_( size ) 					-- Вывести отступ указанной 
 	return img("blank:" .. size .."x1");
 end
 
-function prnd_( phrases )					-- Возвращает случайную реплику из набора phrases
-	isErr( type(phrases) ~= "table", "'prnd' get table as argument" ) 
-	return phrases[ rnd(#phrases) ];
-end
-
-function prnd( phrases )
-	p( prnd_(phrases) )
+function prnd( arg )							-- Возвращает случайную реплику из таблицы arg
+	isErr( type(arg) ~= "table", "'prnd' get table as argument" )
+	unfold( arg[ rnd(#arg) ] );
 end
 
 function floor_ (num, round_to)			-- Возвращает num с точностью до round_to знака после запятой 
@@ -51,7 +47,7 @@ function _dynout (vis_desc)				-- Динамическое описание сц
 		if visit ~= #vis_desc then
 			visit = visit + 1;
 		end
-		return vis_desc[visit];	
+		return unfold( vis_desc[visit] );	
 	end
 end
 
@@ -60,19 +56,25 @@ function switch (condition)				-- Оператор выбора для усло�
 		isErr( type(data) ~= "table", "Switch data should be table. Got: " .. type(data) );
 
 		local react = data[condition] or data.def or function() return true end;
-		local t = type( react );
-	
-		if t == "string" then
-			p (react);
-		elseif t == "function" then
-			react();
-		else
-			error ("Check data fields! One of them is: " .. t, 2 ); 
-		end	
+		unfold( react )
 	end
 end
 
 --{ Следующие секцию я подсмотрел у vorov2
+function unfold ( handler, mayTable )	-- Вспомогательная функция, обеспечивающая полиморфизм данных
+	local t = type(handler)					-- В зависимости от типа (строка/функция), либо выводит, либо исполняет handler
+	if t == "string" then
+		p( handler );
+	elseif t == "function" then
+		handler();
+	elseif t == "table" and mayTable then -- Если передать вторым параметром true, то будет "проигрывать" таблицы
+		for _, val in ipairs(handler) do
+			unfold( handler )
+		end
+	else
+		error ("Check data's fields! One of them is: " .. t, ); 
+	end
+end
 function sound (nam, chanel)				
 	set_sound("snd/" .. nam .. ".ogg", chanel);
 end
@@ -88,9 +90,9 @@ end
 function _if ( cond, pos, neg )			-- Сокращение на случай, если обработчик имеет два состояния и возвращает текст
 	return function(s)						-- cond - строка с именем управляющей переменной (из этого объекта/комнаты)
 		if s[cond] then
-			p( pos );
+			unfold( pos );
 		else
-			p( neg );
+			unfold( neg );
 		end
 	end
 end
@@ -98,10 +100,10 @@ end
 function _trig ( cond, pos, neg )		-- Для двухступенчатых событий. Первый раз выполняется posact, все остальные - negact 
 	return function(s)						-- Пример использования: объекты с вводным(расширенным) и игровым описаниями 
 		if s[cond] then
-			p( pos );
+			unfold( pos );
 			s[cond] = false;
 		else
-			p( neg );
+			unfold( neg );
 		end
 	end
 end

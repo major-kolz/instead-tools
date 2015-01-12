@@ -17,26 +17,11 @@ local function stm_curr(s, isBranches)										-- Get current machine's state/b
 	return s[mod][ s.current_state ] or {};
 end
 
-<<<<<<< HEAD
-<<<<<<< HEAD
---TODO extends for branches
-
-local function stm_select ( machine, state, field, isBranches )
-	local mod = isBranches and "branches" or "states"
-	local state_holder = machine[mod][state]
-	isErr(state_holder==nil,"Your machine ('"..machine.nam.."') haven't state: "..state); -- Ошибка укажет на stm в этом файле(
-=======
-local function stm_select ( machine, state, field, mod )
-	mod = mod or "states"
-	local state_holder = machine[mod][state]
-=======
 local function stm_select ( machine, state, field )
 	local state_holder = machine.states[state]
->>>>>>> 27f6ba3597f806be4c9b82edae377e1bd198580b
 	isErr( state_holder == nil, 											-- Ошибка укажет на stm в этом файле, увы...
 			"Your machine '".. deref(machine) .."' haven't state: " .. state 
 			);
->>>>>>> ecfb0283417f8f71de5522fd35de8a7540747904
 	isErr( type( state_holder ) ~= "table", "Your machine's state '" .. state .. "' isn't table" )
 	
 	if field == "nam" or field == 1 then								-- Проверяем, есть iam, потом имя, потом по предкам
@@ -59,43 +44,9 @@ local function stm_select ( machine, state, field )
 	return reaction
 end
 
-<<<<<<< HEAD
-function stmPrev( initial_branch )										-- Безусловный обработчик перехода назад
-	return function( machine )												-- Если требуется переход при выполнении условия.
-		if machine.stm_prevState then											-- то лучше писать обработчик самому
-			return machine.stm_prevState										-- Прошлое значение вызывается этой строкой
-		else
-			isErr( initial_branch == nil, "This state machine haven't previous state! For avoid it specify 'stmPrev(<state>)'" )
-			return initial_branch
-		end
-	end
-end
-
-function stmJump( otherwise )												-- Безусловный обработчик перехода на сохраненное состояние
-	return function( machine )
-		if machine.stm_savedState then
-			return machine.stm_savedState
-		else
-			isErr( otherwise == nil, "This state machine haven't saved state! For avoid it specify 'stmJump(<state>)'" )
-			return otherwise 
-		end
-	end
-end
-
-function stmUnswer( reactions )
-	return function( s, w )
-		return reactions[deref(w)] or reaction.def or true;
-	end
-end
-
-function stm_handler( machine, handlerName, ... )					-- Показываем реакцию, проверяем условие изменения состояния
-=======
 local function stm_handler( machine, handlerName, ... )			-- Показываем реакцию, проверяем условие изменения состояния
->>>>>>> 27f6ba3597f806be4c9b82edae377e1bd198580b
 	local handler, jumpTo;
-<<<<<<< HEAD
 	handler = stm_select(machine, machine.current_state, handlerName)
-=======
 
 	if handlerName == "nam" or handlerName == 1 then
 		isErr( stm_curr(machine) == nil, "State '" .. tostring(state) .. "' doesn't exist (".. deref(machine) ..")" )
@@ -105,7 +56,6 @@ local function stm_handler( machine, handlerName, ... )			-- Показывае�
 	else
 		handler = stm_select(machine, machine.current_state, handlerName)
 	end
->>>>>>> ecfb0283417f8f71de5522fd35de8a7540747904
 
 	if handlerName == "touch" then
 		local binding = stm_select(machine, machine.current_state, "bind")	-- bind & binds указываются в states
@@ -238,4 +188,10 @@ end
 function stmTak( dsc, tak, used )					-- Короткая форма для создания состояния. Так как нет имени переход в branches обязателен!
 	isErr( not string.match(dsc, "{.*}"), "Do you forgot {<link>} in dsc?" ) 
 	return { dsc = dsc, touch = tak, used = used, takable = true }
+end
+
+function stmUnswer( reactions )
+	return function( s, w )
+		return reactions[deref(w)] or reaction.def or true;
+	end
 end

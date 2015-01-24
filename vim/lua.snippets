@@ -38,6 +38,8 @@ snippet swap
 	${1:<arg1>}, ${2:<arg2>} = $2, $1;
 snippet error
 	error( "${1}"${2:, 2})
+snippet req
+	require "${1:Module}";
 #
 # ===Функции
 snippet fun
@@ -83,6 +85,9 @@ snippet ;n
 	"${1}";
 snippet ;l
 	, "${1}";
+snippet ;н
+	,
+	"${1}";
 #
 # ===Разграничение блоков кода
 snippet --=
@@ -104,12 +109,13 @@ snippet insteadbegin
 
 	instead_version "`system("instead -version")`";
 
-	require 'useful'					-- Набор полезных функций
 	require 'xact'
 	require 'format'
 	format.para 	= true;			-- Отступы в начале абзаца;
 	format.dash 	= true;			-- Замена двойного минуса на длинное тире;
 	format.quotes 	= true;			-- Замена " " на типографские << >>;
+
+	require 'useful'					-- Набор полезных функций
 
 	main = room {
 		nam = '...',
@@ -290,13 +296,6 @@ snippet hideinv
 	hideinv = true;
 snippet nolife
 	nolife = true;
-#
-# ===Использование внешних ресурсов
-snippet req
-	require "${1:Module}";
-snippet dofile
-	dofile "${1:Filename}.lua";
-
 #
 # ===Вспомогательные конструкции
 snippet p

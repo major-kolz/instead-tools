@@ -15,31 +15,34 @@ format.dash 	= true;			-- Замена двойного минуса на дли
 format.quotes 	= true;			-- Замена " " на типографские << >>;
 
 require 'useful'
+require 'metaclass'
+require "dbg"
 
 main = room {
 	nam = '...',
 	dsc = nil;
 	obj = {
-		"paint", "block",
+		"paint", "block", "blockT";
 	},
 };
 
 paint = obj{
 	nam = "Краска",
-	dsc = "Вы видите {банку краски}, поверх лежит кисточка}";
+	dsc = "Вы видите {банку краски}, поверх лежит кисточка.";
 	tak = [[Можно раскрашивать!]],
 	var {
 		amount = 14;
 	},
-	inv = _say "В банке осталось %amount краски",
+	inv = _say "С внутренне стороны банке есть шкала. Сейчас уровень краски на отметке @amount",
 	use = function(s, w)
-		if w == "block" then
+		if isEq( block, w ) then
 			if w.colored then
 				p [[Уже окрашен. Не вижу смысла покрывать в два слоя]]; 
 			else
 				if s.amount >= w.area then	
-					w:paint();
 					s.amount = s.amount - w.area
+					w.colored = true
+					p "Покрашено"
 				else
 					p "Краски не хватит"
 				end
@@ -48,7 +51,7 @@ paint = obj{
 	end,
 }
 
-block = obj{
+block = metaclass {
 	nam = "_",
 	dsc = "Небольшой {кубик}",
 	var {
@@ -58,4 +61,9 @@ block = obj{
 	act = _if( "colored",
 		"Покрашен синей краской",
 		"Деревянный кубик, хорошо умещаться в ладони" );
+}
+
+blockT = extends(block) {
+	nam = [[_]],
+	dsc = "Большой {кубик}",
 }

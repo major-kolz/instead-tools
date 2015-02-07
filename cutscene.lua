@@ -1,14 +1,16 @@
--- Модуль cutscene для для последовательной подачи текста
--- Автор: Пётр Косых, http://instead.syscall.ru/wiki/ru/gamedev/modules/cutscene
--- 	Изменения: 
--- 		Внешний вид {cut} "по-умолчанию" теперь определяется полем _cutDefTxt (">>>"). 
--- 		{cut} теперь предварен _cutPrefix (по-умолчанию: "^^" - кнопка выводится через пустую строку)  
--- 		Добавлен тэг {upd}, что эквивалентен прошлому {cut}{cls}. 
--- 		{upd} вызывает метод update() комнаты-cutscene
--- 		Удален cls (upd покрывает функциональность)
--- 		Можно использовать left
--- 	https://github.com/major-kolz/instead-tools/blob/master/cutscene.lua
--- 	Николай Коновалов
+-- Модуль для последовательной подачи текста cutscene, модернизированный  
+-- Основа: http://instead.syscall.ru/wiki/ru/gamedev/modules/cutscene, автор: Пётр Косых	
+--
+-- Отличия от основной версии: 
+--		тэги теперь облекаются в квадратные скобки, а не в фигурные (можно вставлять в текст xact)
+--		Внешний вид [cut] "по-умолчанию" теперь определяется полем _cutDefTxt (">>>"). 
+--		[cut] теперь предварен _cutPrefix (по-умолчанию: "^^" - кнопка выводится через пустую строку)  
+--		Добавлен тэг [upd], что эквивалентен прошлому {cut}{cls}. 
+--		[upd] вызывает метод update() комнаты-cutscene
+--		Удален cls (upd покрывает функциональность)
+--		Можно использовать left
+-- https://github.com/major-kolz/instead-tools/blob/master/cutscene.lua
+-- v1.2 by major kolz
 
 require "timer"
 require "xact"
@@ -18,7 +20,7 @@ local function get_token(txt, pos)
 	local s, e;
 	e = pos
 	while true do
-		s, e = txt:find("[\\{]", e);
+		s, e = txt:find("[\\%[]", e);
 		if not s then
 			break
 		end
@@ -32,11 +34,11 @@ local function get_token(txt, pos)
 	local ss, ee
 	ee = e
 	while s do
-		ss, ee = txt:find("[\\{}]", ee + 1);
+		ss, ee = txt:find("[\\%[%]]", ee + 1);
 		if ss then
 			if txt:sub(ss, ss) == '\\' then
 				ee = ee + 1
-			elseif txt:sub(ss, ss) == '{' then
+			elseif txt:sub(ss, ss) == '%]' then
 				nest = nest + 1
 			else
 				nest = nest - 1

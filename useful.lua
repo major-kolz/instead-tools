@@ -72,9 +72,10 @@ function switch (condition)				-- Оператор выбора для усло�
 		isErr( type(data) ~= "table", "Switch data should be table. Got: " .. type(data) );
 
 		local react = data[condition] or data.def or function() return true end;
-		local event = data.event or function() return true end;
 		unfold( react )
-		unfold( event )						-- Поле event вызывается каждый раз. Можно присвоить функцию со счетчиком, к примеру
+		if data.event then					-- Поле event вызывается каждый раз. Можно присвоить функцию со счетчиком, к примеру
+			unfold( data.event )
+		end
 	end
 end
 

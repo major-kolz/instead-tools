@@ -55,7 +55,7 @@ snippet funsw
 		${1:-- Code}
 	end,
 snippet func
-	function ${1:Function_name} ( ${2:Args} )
+	function ${1:Function_name}( ${2:args} )
 		${3:-- Code}	
 	end
 #	
@@ -104,8 +104,8 @@ snippet --=2
 # ===Создание шапки
 snippet insteadbegin
 	--$Name: ${1:Game name}$
-	--$Version: 0.1
-	--$Author: ${2:Author}
+	--$Version: 0.1$
+	--$Author: ${2:Author}$
 
 	instead_version "`system("instead -version")`";
 
@@ -258,20 +258,21 @@ snippet invf
 	inv = function(s)
 		${1}
 	end,
+# Идея подобного именования аргументов подсмотренна у Владимира Балашова
 snippet enterf
-	enter = function(s, w)
+	enter = function(here, from)
 		${1}
 	end,
 snippet enteredf
-	entered = function(s, w)
+	entered = function(here, from)
 		${1}
 	end,
 snippet exitf
-	exit = function(s, w)
+	exit = function(here, to)
 		${1}
 	end,
 snippet leftf
-	left = function(s, w)
+	left = function(here, to)
 		${1}
 	end,
 #
@@ -345,6 +346,7 @@ snippet phr
 	[${1:Number}] = phr(${2:You phrase}, ${3:Other phrase}, [[${4:Code}]]),
 snippet _phr
 	[${1:Number}] = _phr(${2:You phrase}, ${3:Other phrase}, [[${4:Code}]]),${5}
+#
 # ===Управляющие русские комбинации
 snippet нл
 	^ ${1}
@@ -396,3 +398,14 @@ snippet msc
 	music "${1:<nam>}";
 snippet imgpth	
 	image_ "${1:<nam>}";
+snippet cutscene
+	cutscene{
+		nam = "...",
+		dsc = [[ ${1}
+			{cut} {code back()}
+		]];
+	};
+snippet кат
+	[cut] 
+snippet упд
+	[upd]

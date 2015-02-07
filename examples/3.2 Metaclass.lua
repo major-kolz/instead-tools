@@ -2,7 +2,6 @@
 -- Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 -- http://www.apache.org/licenses/LICENSE-2.0>
 
---$Name: Game name$
 --$Version: 0.1
 --$Author: major kolz$
 

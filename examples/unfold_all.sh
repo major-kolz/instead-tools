@@ -20,7 +20,6 @@ do
 		mkdir "$fnam"
 		ln -s "$file" "$gameDir/$fnam"
 		mv "$gameDir/$fnam/$fnam.lua" "$gameDir/$fnam/main.lua"
-		ln -s "$gameDir/instead-tools/useful.lua" "$gameDir/$fnam"
 	fi
 done
 

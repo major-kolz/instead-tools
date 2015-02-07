@@ -28,25 +28,25 @@ function isErr( cond, msg, lvl )			-- Лаконичная форма для о�
 	end
 end
 
-function unfold ( handler, mayTable )	-- Вспомогательная функция, обеспечивающая полиморфизм данных
+function unfold ( handler, returnIt )	-- Вспомогательная функция, обеспечивающая полиморфизм данных
 	local t = type(handler)					-- В зависимости от типа (строка/функция), либо выводит, либо исполняет handler
 	if t == "string" then
-		p( handler );
+		if returnIt then
+			return handler
+		else
+			p( handler );
+		end
 	elseif t == "function" then
 		handler();
-	elseif t == "table" and mayTable then -- Если передать вторым параметром true, то будет "проигрывать" таблицы
-		for _, val in ipairs(handler) do
-			unfold( val )
-		end
 	else
 		error( "Check data's fields! One of them is: " .. t ); 
 	end
 end
 --}
 
-function prnd( arg )							-- Возвращает случайную реплику из таблицы arg
+function prnd( arg, needReturn )			-- Возвращает случайную реплику из таблицы arg
 	isErr( type(arg) ~= "table", "'prnd' get table as argument" )
-	unfold( arg[ rnd(#arg) ] );
+	return unfold( arg[ rnd(#arg) ], needReturn );
 end
 
 function _prnd( arg )
@@ -72,7 +72,9 @@ function switch (condition)				-- Оператор выбора для усло�
 		isErr( type(data) ~= "table", "Switch data should be table. Got: " .. type(data) );
 
 		local react = data[condition] or data.def or function() return true end;
+		local event = data.event or function() return true end;
 		unfold( react )
+		unfold( event )						-- Поле event вызывается каждый раз. Можно присвоить функцию со счетчиком, к примеру
 	end
 end
 

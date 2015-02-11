@@ -4,7 +4,7 @@
 
 
 --====================| Набор полезных функций |====================--
--- Отображение документа: 
+-- Отображение документа:
 -- 	табуляция = 3 пробела, 133 символа в строке 
 -- Соглашение о именовании:
 -- 	нижнее подчеркивание в конце имени	= возвращается значение
@@ -22,7 +22,7 @@ function offset_( size ) 					-- Вывести отступ указанной 
 end
 
 --{ Метафункции, облегчают написание кода, не описывающего непосредственно игровые конструкции
-function isErr( cond, msg, lvl )			-- Лаконичная форма для отлова ошибок.   
+function isErr( cond, msg, lvl )			-- Лаконичная форма для отлова ошибок.
 	if cond then
 		error( msg, lvl or 3 )				-- Если используете непосредственно в комнатах/объектах - передавайте '2' на месте lvl
 	end
@@ -67,7 +67,7 @@ function _dynout (vis_desc)				-- Динамическое описание сц
 	end
 end
 
-function switch (condition)				-- Оператор выбора для условия condition
+function switch( condition )			-- Оператор выбора для условия condition
 	return function(data)					-- data может иметь поле def: на случай недопустимых значений condition 
 		isErr( type(data) ~= "table", "Switch data should be table. Got: " .. type(data) );
 
@@ -94,7 +94,7 @@ end
 
 function music (nam)							
 	set_music("mus/" .. nam .. ".ogg");	
-end 
+end
 
 function image_ (nam)						
 	return 'img/' .. nam .. '.png';	
@@ -148,7 +148,7 @@ function _say ( phrase, ... )				-- Создание обработчика-ин
 			if #txt == #var then p( handler );
 			else                 p( handler .. txt[#txt] )	end
 		end
-	elseif #value > 0 then				-- Расширенная форма с заполнителями в С-стиле %<...> 
+	elseif #value > 0 then				-- Расширенная форма с заполнителями в С-стиле %<...>
 		for _, v in ipairs( value ) do isErr( type(v) ~= "string", "Value may be string or table of strings" ) end
 		react = function( s )						
 			local open_values = {}
@@ -159,14 +159,15 @@ function _say ( phrase, ... )				-- Создание обработчика-ин
 		error( "Check '_say' second argument's: it should be string and (optional) fields' name (strings too)", 2 )
 	end
 
-	return react 	
+	return react
 end
 
 function vis_change ( obj )				-- Переключатель состояния объектов 
 	if disabled( obj ) then
 		obj:enable();
-	else 
+	else
 		obj:disable();
 	end
 end
+
 -- vim: set tabstop=3 shiftwidth=3 columns=133

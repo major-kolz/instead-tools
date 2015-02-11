@@ -12,16 +12,16 @@ snippet n=
 snippet ret
 	return ${1:true};
 snippet for
-	for ${1:i = 1}, ${2} do 
+	for ${1:i = 1}, ${2} do
 		${3}
 	end
 snippet forg
-	for i, v in ${4:ipairs}( ${1} ) do 
+	for i, v in ${4:ipairs}( ${1} ) do
 		${2}
 	end ${3}
 snippet forg2
-	for i, _val in ipairs( ${1} ) do 
-		for j, _lav in ipairs( _val ) do 
+	for i, _val in ipairs( ${1} ) do
+		for j, _lav in ipairs( _val ) do
 			${2:io.write( _lav .. "\t" );}
 		end
 		${3:print "";}
@@ -300,13 +300,13 @@ snippet nolife
 #
 # ===Вспомогательные конструкции
 snippet p
-	p [[${1:Text}]]; 
+	p [[${1:Text}]];
 snippet p(
 	p( "${1} " .. ${2} );
 snippet p{
 	p "${1}{${2}}${3}";
 snippet pn
-	p [[${1:Text}]]; 
+	p [[${1:Text}]];
 snippet print
 	print( ${1:text } ${2:.. <codevar>} ); 
 snippet plr
@@ -408,4 +408,4 @@ snippet cutscene
 snippet кат
 	[cut] 
 snippet упд
-	[upd]
+	[upd] 

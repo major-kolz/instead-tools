@@ -24,4 +24,4 @@ do
 	fi
 done
 
-notify-send "--expire-time=3000" "INSTEAD-tools' modules" "Модули готов к применению"
+notify-send "--expire-time=3000" "INSTEAD-tools' modules" "Модули готовы к применению"

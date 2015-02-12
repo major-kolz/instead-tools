@@ -13,7 +13,7 @@ format.quotes 	= true;			-- Замена " " на типографские << >>
 --====================| Код |====================-- 
 require 'useful'					-- Набор полезных функций
 
--- Написано с адаптации на INSTEAD Вадимом Балашовым игры werewolf'а "City of Mist"
+-- Написано с ремайка на INSTEAD Вадимом Балашовым игры werewolf'а "City of Mist"
 -- Генерирует текст по заданному шаблону (template), подставляя на место заполнителей случайные строки из phrases и mimics
 function combprnd( phrases, template )
 	if not template then
@@ -38,11 +38,33 @@ function	_lookprnd( phrases )
 		end
 	end
 end
+
+-- Для обработчиков входа-выхода и use/used
+function _select( variance )
+	isErr( type(variance) ~= "table", "Argument of '_select' should be table" )	
+	if not variance.react then	variance.react = p 	end
+
+	return function( _, arg )
+		local impact = variance[ deref(arg) ]
+		if impact then
+			variance.react( impact )
+		end
+	end
+end
+
 --====================| Интерактивный пример |====================-- 
 main = room {
 	nam = "...";
+	left = _select {
+		room1 = "Можно полюбоваться на ворон, что так любят рассесться у соседа на ели",
+		room2 = "Мне все не дает покоя мысль скрестить топку и элементы Пельтье",
+		room3 = "Квадракоптер, по щелчку подающий планшет - с которого можно включить свет на кухне...";
+	},
 	obj = {
 		"radio", "box"
+	},
+	way = {
+		"room1", "room2", "room3";
 	},
 };
 
@@ -53,7 +75,7 @@ radio = obj{
 		combprnd{
 			"Полным ходом идет добыча мифрила с астероида Мория-3",
 			"Экономисты прогнозируют повышение цен в секторе частной гидропоники",
-			""; 
+			"Превалирующим число голосов Трибунат отклонил прошение о признании высше-верхнего сословия"
 			}{
 			"звучит из динамиков",
 			"зачитывает диктор",
@@ -72,3 +94,37 @@ box = obj{
 		"В условии делить с присваиванием?! А, это отрицание такое...";
 	},
 }
+
+room1 = room{
+	nam = "Пост наблюдения",
+	dsc = nil,
+	way = {
+		vroom("Назад", 'main'),
+	},
+	obj = {
+		'monitors', 'ring';	-- объекты для демонстрации _select в качестве обработчика в used
+	}
+};
+
+room2 = room{
+	nam = "У камина",
+	dsc = nil,
+	way = {
+		vroom("Назад", 'main'),
+	},
+};
+
+room3 = room{
+	nam = "Сижу в кресле",
+	disp = function(s)
+		if here() == s then
+			return "В кресле"
+		else
+			return "В кресло"
+		end
+	end,
+	dsc = nil,
+	way = {
+		vroom("Назад", 'main'),
+	},
+};

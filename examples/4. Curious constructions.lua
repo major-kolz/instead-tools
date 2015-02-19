@@ -42,7 +42,7 @@ end
 -- Для обработчиков входа-выхода и use/used
 function _select( variance )
 	isErr( type(variance) ~= "table", "Argument of '_select' should be table" )	
-	if not variance.react then	variance.react = p 	end
+	if not variance.react then	variance.react = p 	end		-- можно и walk передать, и prnd
 
 	return function( _, arg )
 		local impact = variance[ deref(arg) ]

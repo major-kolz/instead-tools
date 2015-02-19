@@ -123,11 +123,10 @@ snippet insteadbegin
 		dsc = txtr [["$1"]] .. txtr[[^Автор: $2]] ..
 			[[${3}]]
 			.. [[^^Если это ваша первая {instead|INSTEAD}-игра - пройдите сперва {intro|обучение}.]],
-		obj = { 
-			vway("next", "^^^^^^^^^^^^{> Начать игру!}", '${4:first_game_room}'),
-			xact( "insteados", "Сборник игр-рассказов на тематику космического путешествия - очень советую :)" ),
-			xact( "instead", "http://instead.syscall.ru/" ),
-			xact( "intro", "Для перехода нажмите Esc, выберите пункт \"Выбор игры\" и \"Обучение\"" );
+		obj = {
+			vway( 'next', "^^^^^^^^^^^^{> Начать игру!}", '${4:first_game_room}' ),
+			xact( 'instead', "http://instead.syscall.ru/" ),
+			xact( 'intro', "Для перехода нажмите Esc, выберите пункт \"Выбор игры\" и \"Обучение\"" );
 		},
 	};
 
@@ -283,11 +282,11 @@ snippet leftf
 # ===Табличные поля
 snippet obj=
 	obj = {
-		"${1}";${2}
+		'${1}';${2}
 	},
 snippet way
 	way = {
-		"${1}";${2}
+		'${1}';${2}
 	},
 snippet var
 	var {
@@ -333,9 +332,9 @@ snippet init
 		${1:-- Code}
 	end;
 snippet xact
-	xact( "${1:id}", "${2:message}" ),
+	xact( '${1:id}', "${2:message}" ),
 snippet xacd
-	xact( "${1:id}", code[[${2:action}]] ),
+	xact( '${1:id}', code[[${2:action}]] ),
 snippet code
 	code[[${1}]]${2:;}
 snippet click

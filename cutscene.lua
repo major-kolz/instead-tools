@@ -175,6 +175,9 @@ cutscene = function(v)
 				n = n - 1
 				out = out .. "^"
 			elseif c == "pic" then
+				if a == '' then 
+					error( "Forgot argument (path to resource) for 'pic'", 2 )
+				end
 				self._pic = a
 			elseif c == "code" then
 				code = code + 1

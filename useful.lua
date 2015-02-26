@@ -67,7 +67,7 @@ function _dynout (vis_desc)				-- Динамическое описание сц
 	end
 end
 
-function switch( condition )			-- Оператор выбора для условия condition
+function switch( condition )				-- Оператор выбора для условия condition
 	return function(data)					-- data может иметь поле def: на случай недопустимых значений condition 
 		isErr( type(data) ~= "table", "Switch data should be table. Got: " .. type(data) );
 

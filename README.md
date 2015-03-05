@@ -10,9 +10,6 @@ Code wrappers for high-usage constructions (selections from list by index, error
 * ##### cutscene.lua
 Modified [cutscene module](http://instead.syscall.ru/wiki/ru/gamedev/modules/cutscene)(ru). See changes-list at head of file.
 
-* ##### vim/
-Make my favorite [text editor](http://www.vim.org/) more suitable for INSTEAD's gamewritting
-
 * ##### classes/
 Quick constructor for some patterns of *obj*. Pattern covered: finite state machine.
 

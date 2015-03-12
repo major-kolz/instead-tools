@@ -42,6 +42,31 @@ function unfold( handler, returnIt )	-- Вспомогательная функ�
 		error( "Check data's fields! One of them is: " .. t ); 
 	end
 end
+
+function divBy( text, command_regex, exclusive ) -- Возвращает 1) все подстроки из text, соответствующие command_regex и 2) оставшийся тест
+	local start, finish;
+	local ordinary, commands = {}, {}
+
+	while text ~= nil do
+		start, finish = string.find( text, command_regex )
+
+		if start == nil or finish == nil then break end
+
+		table.insert( ordinary, string.sub( text, 1, start-1 ))
+		if exclusive then  -- Отрезать последний символ (замыкающий регион command_regex) 
+			table.insert( commands, string.sub( text, start+1, finish-1 ))
+		else
+			table.insert( commands, string.sub( text, start+1, finish ))
+		end
+		text = string.sub( text, finish+1 )
+	end
+
+	if text ~= nil then
+		table.insert( ordinary, text )
+	end
+
+	return ordinary, commands
+end
 --}
 
 function prnd( arg, needReturn )			-- Возвращает случайную реплику из таблицы arg
@@ -129,17 +154,7 @@ function _say( phrase, ... )				-- Создание обработчика-ин�
 	
 	if #value == 0 then						-- Короткая форма: строка, отображаемые поля помечаются @ (пример: "Всего яблок: @count")
 		isErr( string.find(phrase, "@") == nil, "Use phrase without placeholder: @<name>" )
-		local start, finish;
-		local txt = {};
-		local var = {};
-		while phrase ~= nil do
-			start, finish = string.find( phrase, "@[a-zA-z]*" )
-
-			if start == nil or finish == nil then break end
-			table.insert( txt, string.sub( phrase, 1, start-1 ));
-			table.insert( var, string.sub( phrase, start+1, finish )); 
-			phrase = string.sub( phrase, finish+1 )
-		end
+		local txt, var = divBy( phrase, '@[a-zA-z0-9_]*' ) 
 		react = function( s )
 			local handler = ""
 

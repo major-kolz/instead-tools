@@ -107,7 +107,7 @@ end
 function _visits( variants )				-- Аналог _dynout, завязанный на посещения комнаты (без def будет выход за границы)
 	isErr( type(variants) ~= "table", "_visits take table as parameter" )
 	return function()
-		switch( visited() )( variants )
+		switch( visits() )( variants )
 	end
 end
 
@@ -185,4 +185,4 @@ function vis_change( obj )				-- Переключатель состояния �
 	end
 end
 
--- vim: set tabstop=3 shiftwidth=3 columns=133
+-- vim: set tabstop=3 shiftwidth=3 columns=133 foldmethod=syntax

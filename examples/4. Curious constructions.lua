@@ -52,9 +52,30 @@ function _select( variance )
 	end
 end
 
+-- Из комментария к статье: http://ifhub.ru/blog/ifarticles/64.html#comment342
+-- Превращаем те
+function _rbtxt( desc )			-- random build text
+	isErr( string.find(desc,'%[') == nil, 
+		"Your text haven't variants: [<phr1>\<phr2>...]" )
+	local ordinary_text, random_phrases = divBy( desc, '%[[^%[]*%]', true )		-- варианты сосредоточены между []
+	for i=1, #random_phrases do
+		local variants, _ = divBy( random_phrases[i], '/' )
+		random_phrases[i] = variants
+	end
+
+	return function()
+		local handler = ""
+
+		for i = 1, #random_phrases do handler = handler .. ordinary_text[i] .. prnd(random_phrases[i],true)	end
+
+		if #ordinary_text == #random_phrases then p( handler );
+		else                 p( handler .. ordinary_text[#ordinary_text] )	end
+	end
+end
 --====================| Интерактивный пример |====================-- 
 main = room {
 	nam = "...";
+	dsc = _rbtxt [["[Как/Хорошо ли идут] твои дела?" -- [спросил/поинтересовался] Аноним]],
 	left = _select {
 		room1 = "Можно полюбоваться на ворон, что так любят рассесться у соседа на ели",
 		room2 = "Мне все не дает покоя мысль скрестить топку и элементы Пельтье",
@@ -102,7 +123,8 @@ room1 = room{
 		vroom("Назад", 'main'),
 	},
 	obj = {
-		'monitors', 'ring';	-- объекты для демонстрации _select в качестве обработчика в used
+		--'monitors', 'ring';	-- объекты для демонстрации _select в качестве обработчика в used
+		-- предложить латку, для более информативных сообщений при ошибке объявленных, но не инициализированных объектов
 	}
 };
 

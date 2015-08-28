@@ -27,16 +27,11 @@ function extends ( parent, complementing )
 	return function( child )
 		child.parent = parent
 		local safed = {}
-		for v, w in pairs(parent.variables_save) do			-- Наследуются лишь объявленный через var переменные
+		for v, _ in pairs(parent.variables_save) do			-- Наследуются лишь объявленный через var переменные
 			if not child[v] then
-				print( v, w )
-				safed[v] = w
+				safed[v] = parent[v]
 			end
 		end	
-		print "---"
-		for i, v in pairs( safed ) do 
-			print( i, v )
-		end 
 		stead.add_var( child, safed )
 
 		for _, v in ipairs { 'dsc', 'act', 'tak', 'inv', 'use', 'used' } do
@@ -46,7 +41,7 @@ function extends ( parent, complementing )
 				local handler = child[v]
 				child[v] = function( arg1, arg2 )  
 					if not parent[v]( child, arg2 ) then 
-						handler( child, arg2 );
+						return handler( child, arg2 );
 					end
 				end;
 			end

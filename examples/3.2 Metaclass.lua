@@ -51,7 +51,7 @@ paint = obj{
 }
 
 block = metaclass {
-	nam = "_",
+	nam = "block",
 	dsc = "Небольшой {кубик}",
 	var {
 		area = 6;

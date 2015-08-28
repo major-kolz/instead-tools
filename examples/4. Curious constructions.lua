@@ -13,7 +13,7 @@ format.quotes 	= true;			-- Замена " " на типографские << >>
 --====================| Код |====================-- 
 require 'useful'					-- Набор полезных функций
 
--- Написано с ремайка на INSTEAD Вадимом Балашовым игры werewolf'а "City of Mist"
+-- Написано с ремейка на INSTEAD Вадимом Балашовым игры werewolf'а "City of Mist"
 -- Генерирует текст по заданному шаблону (template), подставляя на место заполнителей случайные строки из phrases и mimics
 function combprnd( phrases, template )
 	if not template then
@@ -44,8 +44,9 @@ function _select( variance )
 	isErr( type(variance) ~= "table", "Argument of '_select' should be table" )	
 	if not variance.react then	variance.react = p 	end		-- можно и walk передать, и prnd
 
-	return function( _, arg )
-		local impact = variance[ deref(arg) ]
+	return function( self, arg )
+		local id = deref(arg) or variance.handler(self)
+		local impact = variance[ id ]
 		if impact then
 			variance.react( impact )
 		end
@@ -125,7 +126,7 @@ room1 = room{
 	obj = {
 		--'monitors', 'ring';	-- объекты для демонстрации _select в качестве обработчика в used
 		-- предложить латку, для более информативных сообщений при ошибке объявленных, но не инициализированных объектов
-	}
+	},
 };
 
 room2 = room{

@@ -2,8 +2,8 @@
 -- Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 -- http://www.apache.org/licenses/LICENSE-2.0>
 
---$Version: 0.1
---$Author: major kolz$
+--$Version: 0.1 $
+--$Author: major kolz $
 
 instead_version "2.0.3";
 

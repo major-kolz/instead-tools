@@ -39,19 +39,7 @@ function	_lookprnd( phrases )
 	end
 end
 
--- Для обработчиков входа-выхода и use/used
-function _select( variance )
-	isErr( type(variance) ~= "table", "Argument of '_select' should be table" )	
-	if not variance.react then	variance.react = p 	end		-- можно и walk передать, и prnd
 
-	return function( self, arg )
-		local id = deref(arg) or variance.handler(self)
-		local impact = variance[ id ]
-		if impact then
-			variance.react( impact )
-		end
-	end
-end
 
 -- Из комментария к статье: http://ifhub.ru/blog/ifarticles/64.html#comment342
 -- Превращаем те
@@ -119,13 +107,13 @@ box = obj{
 
 room1 = room{
 	nam = "Пост наблюдения",
-	dsc = nil,
 	way = {
 		vroom("Назад", 'main'),
 	},
 	obj = {
 		--'monitors', 'ring';	-- объекты для демонстрации _select в качестве обработчика в used
 		-- предложить латку, для более информативных сообщений при ошибке объявленных, но не инициализированных объектов
+		-- TODO предложить латку, для более информативных сообщений при ошибке объявленных, но не инициализированных объектов
 	},
 };
 

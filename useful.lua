@@ -17,6 +17,11 @@
 --| string.format позволяет выводить заданное количество знаков, преобразовывать в другие формты
 --| txttab позволяет выставить отступ в пикселях. Есть возможность указывать в процентном соотношении - приписывая '%'
 
+function offset_( size ) 					-- Вывести отступ указанной размерности (в пикселях)
+	isErr( size == nil or size < 0, "Недопустимая величина отступа: " .. (size or 'nil') );
+	return img("blank:" .. size .."x1");
+end
+
 --{ Метафункции, облегчают написание кода, не описывающего непосредственно игровые конструкции
 function isErr( cond, msg, lvl )			-- Лаконичная форма для отлова ошибок.
 	if cond then
@@ -178,6 +183,25 @@ function vis_change( obj )				-- Переключатель состояния �
 		obj:enable();
 	else
 		obj:disable();
+	end
+end
+
+function _select( variance )			-- Для обработчиков входа-выхода и use/used
+	isErr( type(variance) ~= "table", "Argument of '_select' should be table" )	
+	if not variance.react then	variance.react = p 	end		-- можно и walk передать, и prnd
+	if type( variance.handler  ) == "string" then 				-- если строка - то используем как аналог switch
+		local field = variance.handler
+		variance.handler = function(s) return s[field] end
+	end
+
+	return function( self, arg )
+		local id = deref(arg) or variance.handler(self)
+		local impact = variance[ id ]
+		if impact then
+			variance.react( impact )
+		elseif variance.def then
+			unfold( variance.def )
+		end
 	end
 end
 

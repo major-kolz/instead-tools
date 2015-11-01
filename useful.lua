@@ -205,4 +205,13 @@ function _select( variance )			-- Для обработчиков входа-в�
 	end
 end
 
+function	_dropList(s)               -- Заготовка для menu (карман) 
+	if s._toOpen then
+		s._toOpen = false
+		s.obj:enable_all();
+	else
+		s._toOpen = true
+		s.obj:disable_all();
+	end	
+end
 -- vim: set tabstop=3 shiftwidth=3 columns=133 foldmethod=syntax

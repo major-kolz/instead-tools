@@ -4,22 +4,29 @@
 -- Отличия от основной версии: 
 --		тэги теперь облекаются в квадратные скобки, а не в фигурные (можно вставлять в текст xact)
 --		Внешний вид [cut] "по-умолчанию" теперь определяется полем _cutDefTxt (">>>"). 
---		[cut] теперь предварен _cutPrefix (по-умолчанию: "^^" - кнопка выводится через пустую строку)  
+--		[cut] и [upd] переводят последующий текст на новую строчку
+--		[cut] теперь предварен _cutPrefix (по-умолчанию: "^" - кнопка выводится через пустую строку, так как один перевод от предыдущего пункта)  
 --		Добавлен тэг [upd], что эквивалентен прошлому {cut}{cls}. 
 --		[upd] вызывает метод update() комнаты-cutscene
 --		Удален cls (upd покрывает функциональность)
 --		Можно использовать left
+--		Переход к следующему состоянию по нажатию space
 -- https://github.com/major-kolz/instead-tools/blob/master/cutscene.lua
--- v1.2 by major kolz
+-- v1.3 by major kolz
 
 require "timer"
 require "xact"
+require "kbd"
+
+stead.module_init(function()
+	hook_keys('space')
+end)
 
 local function get_token(txt, pos)
 	pos = tonumber(pos) or 1;
 	local s, e;
 	e = pos
-	while true do
+	while true do -- ищем открывающуюся скобку [
 		s, e = txt:find("[\\%[]", e);
 		if not s then
 			break
@@ -33,7 +40,7 @@ local function get_token(txt, pos)
 	local nest = 1
 	local ss, ee
 	ee = e
-	while s do
+	while s do -- ищем закрывающуюся (учитывая вложенность)
 		ss, ee = txt:find("[\\%[%]]", ee + 1);
 		if ss then
 			if txt:sub(ss, ss) == '\\' then
@@ -65,12 +72,14 @@ end
 cutscene = function(v)
 	v.txt = v.dsc
 	v.forcedsc = true
-	v._cutPrefix = v._cutPrefix or "^^";			-- предварять cut-кнопку пустой строкой
-	v._cutDefTxt = v._cutDefTxt or ">>>";			-- определим внешний вид cut-кнопки (наверное, можно и картинку через img ) 
-	v._readFrom = 1;										-- счетчик для не отображаемой (просмотренной) части
+	v._cutPrefix = v._cutPrefix or "^";		-- предварять cut-кнопку пустой строкой
+	v._cutDefTxt = v._cutDefTxt or ">>>";	-- определим внешний вид cut-кнопки (наверное, можно и картинку через img ) 
+	v._readFrom = 1;								-- счетчик для не отображаемой (просмотренной) части
+	v._lastButton = 0;							-- запоминаем какое действие должны сделать для kbd
+	v._foldHere = 0;								-- будущее значение _readFrom
 
 	v.update = v.update or function() return false end;
-	v.left_react = "";
+	v.left_react = false;
 	if v.left then
 		v.left_react = v.left	
 	end
@@ -78,13 +87,15 @@ cutscene = function(v)
 	v.left = function(s)
 		timer:set(s._timer);
 		s:reset()
-		local t = type( s.left_react );
-		if t == "string" then
-			p( s.left_react );
-		elseif t == "function" then
-			s:left_react();
-		else
-			error("Illegal 'left' handler! Type is: " .. t )
+		if s.left_react then
+			local t = type( s.left_react );
+			if t == "string" then
+				p( s.left_react );
+			elseif t == "function" then
+				s:left_react();
+			else
+				error("Illegal 'left' handler! Type is: " .. t )
+			end
 		end
 	end;
 
@@ -132,13 +143,30 @@ cutscene = function(v)
 		self._timer = timer:get()
 		self:step();
 	end;
-
+	v.kbd = function(self, down, key)
+		if key == "space" and down then
+			if self._lastButton == 0 then
+				-- Реакция в случае, если "разворачивать" больше нечего. Например:
+				-- set_sound 'snd/error.ogg'
+			else
+				if self._lastButton == 1 then
+					self:step();
+				else
+					self:step_upd();
+				end
+			end
+		end
+		return true;
+	end
 	v.step = function(self)
-		local s, e, c, a 					-- search start, search end, command descriptor, command argument
-		local n = v._state
+		local search_start, search_end, c, a 					-- search start, search end, command descriptor, command argument
+		local phrases_left = v._state
 		local txt = ''
 		local code = 0
 		local out = ''
+		local new_phrase = false
+
+		self._lastButton = 0
 
 		if not self._txt then
 			if type(self.txt) == 'table' then
@@ -156,24 +184,25 @@ cutscene = function(v)
 		else
 			txt = self._txt
 		end
-		while n > 0 and txt do
-			if not e then
-				e = self._readFrom
+
+		while phrases_left > 0 and txt do
+			if not search_end then
+				search_end = self._readFrom
 			end
-			local oe = e
-			s, e = get_token(txt, e)
-			if not s then
+			local oe = search_end
+			search_start, search_end = get_token(txt, search_end)
+			if not search_start then
 				c = nil
 				out = out..txt:sub(oe)
 				break
 			end
 			local strip = true
-			c, a = parse_token(txt:sub(s, e))
+			c, a = parse_token(txt:sub(search_start, search_end))
 			if c == "pause" or c == "fading" then
-				n = n - 1
+				phrases_left = phrases_left - 1
 			elseif c == "cut" or c == "upd" then
-				n = n - 1
-				out = out .. "^"
+				phrases_left = phrases_left - 1
+				new_phrase = true
 			elseif c == "pic" then
 				if a == '' then 
 					error( "Forgot argument (path to resource) for 'pic'", 2 )
@@ -199,14 +228,20 @@ cutscene = function(v)
 			end
 
 			if strip then
-				out = out..txt:sub(oe, s - 1)
+				if new_phrase then
+					new_phrase = false
+					out = out .. txt:sub(oe, search_start - 1) .. "^"
+				else
+					out = out..txt:sub(oe, search_start - 1)
+				end
 			elseif c then
-				out = out..txt:sub(oe, e)
+				out = out..txt:sub(oe, search_end)
 			else
 				out = put..txt:sub(oe)
 			end
-			e = e + 1
+			search_end = search_end + 1
 		end
+
 		v._dsc = out
 		if c == 'pause' then
 			if not a or a == "" then
@@ -219,12 +254,15 @@ cutscene = function(v)
 				a = v._cutDefTxt
 			end
 			v._dsc = v._dsc .. v._cutPrefix .. "{cut|"..a.."}";
+			self._lastButton = 1
 		elseif c == 'upd' then
 			self._state = 1
 			if not a or a == "" then
 				a = v._cutDefTxt
 			end
-			v._dsc = v._dsc .. v._cutPrefix .. "{upd(" .. e .. ")|"..a.."}";
+			v._dsc = v._dsc .. v._cutPrefix .. "{upd|"..a.."}";
+			self._foldHere = search_end
+			self._lastButton = 2
 		elseif c == "fading" then
 			if not a or a == "" then
 				a = game.gui.fading
@@ -233,20 +271,22 @@ cutscene = function(v)
 			timer:set(10)
 		end
 	end
+	v.step_upd = function(self)
+		self:update();
+		self._readFrom = self._foldHere;
+		self._code = 1
+		self:step(); 
+	end
 	v.dsc = function(s)
 		if s._dsc then
 			return s._dsc
 		end
 	end
 	if not v.obj then
-		v.obj = {}
+		v.obj = { }
 	end
 	stead.table.insert(v.obj, 1, xact('cut', function() here():step(); return true; end ))
-	stead.table.insert(v.obj, 2, xact('upd', function() 
-			here():update();
-			here()._readFrom = tonumber(arg1);
-			here():step(); 
-			return true; end )
-	)
+	stead.table.insert(v.obj, 2, xact('upd', function() here():step_upd() return true; end ))
+			 
 	return room(v)
 end

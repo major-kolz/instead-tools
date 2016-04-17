@@ -80,6 +80,7 @@ cutscene = function(v)
 
 	v.update = v.update or function() return false end;
 	v.left_react = false;
+	v.entered_react = false; 
 	if v.left then
 		v.left_react = v.left	
 	end
@@ -97,12 +98,29 @@ cutscene = function(v)
 				error("Illegal 'left' handler! Type is: " .. t )
 			end
 		end
-	end;
+	end
+	if v.entered then
+		v.entered_react = v.entered
+	end
+	v.entered = function(self)
+		if self.entered_react then
+			local t = type( self.entered_react );
+			if t == "string" then
+				p( self.entered_react );
+			elseif t == "function" then
+				self:entered_react();
+			else
+				error("Illegal 'entered' handler! Type is: " .. t )
+			end
+		end
+		self:reset()
+		self._timer = timer:get()
+		self:step();
+	end
 
 	if v.timer then
 		error ("Do not use timer in cutscene.", 2)
 	end
-
 	v.timer = function(s)
 		s._fading = nil
 		s._state = s._state + 1
@@ -110,13 +128,11 @@ cutscene = function(v)
 		s:step()
 		return true
 	end;
-
 	if not v.pic then
 		v.pic = function(s)
 			return s._pic
 		end;
 	end
-
 	if not v.fading then
 		v.fading = function(s)
 			return s._fading
@@ -131,18 +147,8 @@ cutscene = function(v)
 		s._dsc = nil
 		s._pic = nil
 	end
-
 	v:reset()
-
-	if v.entered then
-		error ("Do not use entered in cutscene.", 2)
-	end
-
-	v.entered = function(self)
-		self:reset()
-		self._timer = timer:get()
-		self:step();
-	end;
+	
 	v.kbd = function(self, down, key)
 		if key == "space" and down then
 			if self._lastButton == 0 then

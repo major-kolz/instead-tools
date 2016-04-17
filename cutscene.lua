@@ -12,7 +12,7 @@
 --		Можно использовать left
 --		Переход к следующему состоянию по нажатию space
 -- https://github.com/major-kolz/instead-tools/blob/master/cutscene.lua
--- v1.3 by major kolz
+-- v1.4 by major kolz
 
 require "timer"
 require "xact"
@@ -69,6 +69,8 @@ local function parse_token(txt)
 	return c, a
 end
 
+stead.cut_scroll = true; -- Если сообщение выходит за пределы окна - отмотать к нему
+
 cutscene = function(v)
 	v.txt = v.dsc
 	v.forcedsc = true
@@ -122,6 +124,12 @@ cutscene = function(v)
 		error ("Do not use timer in cutscene.", 2)
 	end
 	v.timer = function(s)
+		if not s._to then
+			if game.timer then
+				return game:timer()
+			end
+			return
+		end
 		s._fading = nil
 		s._state = s._state + 1
 		timer:stop()
@@ -146,6 +154,8 @@ cutscene = function(v)
 		s._txt = nil
 		s._dsc = nil
 		s._pic = nil
+		s._to = nil
+		s._timer_fn = nil
 	end
 	v:reset()
 	
@@ -243,17 +253,21 @@ cutscene = function(v)
 			elseif c then
 				out = out..txt:sub(oe, search_end)
 			else
-				out = put..txt:sub(oe)
+				out = out..txt:sub(oe)
 			end
 			search_end = search_end + 1
 		end
 
+		if stead.cut_scroll then
+			out = out .. iface.anchor()
+		end
 		v._dsc = out
 		if c == 'pause' then
 			if not a or a == "" then
 				a = 1000
 			end
-			timer:set(tonumber(a))
+			self._to = tonumber(a)
+			timer:set(self._to)
 		elseif c == 'cut' then
 			self._state = self._state + 1
 			if not a or a == "" then
@@ -274,7 +288,8 @@ cutscene = function(v)
 				a = game.gui.fading
 			end
 			self._fading = tonumber(a)
-			timer:set(10)
+			self._to = 10
+			timer:set(self._to)
 		end
 	end
 	v.step_upd = function(self)

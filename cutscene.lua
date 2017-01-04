@@ -61,7 +61,7 @@ local function get_token(txt, pos)
 end
 
 local function parse_token(txt)
-	local s, e, t
+	local t
 	t = txt:sub(2, -2)
 	local c = t:gsub("^([a-zA-Z]+)[ \t]*.*$", "%1");
 	local a = t:gsub("^[^ \t]+[ \t]*(.*)$", "%1");
